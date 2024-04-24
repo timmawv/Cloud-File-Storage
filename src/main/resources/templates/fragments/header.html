@@ -1,0 +1,24 @@
+<div th:fragment="header" class="container header">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <div class="col-md-4 mb-2 mb-md-0">
+            <a href="/main-page" class="d-inline-flex link-body-emphasis text-decoration-none">
+                <img src="https://cdn-icons-png.flaticon.com/512/3139/3139112.png" height="80px" alt="sun">
+                <h1 class="sign">Cloud Storage</h1>
+            </a>
+        </div>
+
+
+        <div class="col-md-3 text-end" th:if="${login == null}">
+            <a href="/login" type="button" class="btn btn-outline-primary me-2">Login</a>
+            <a href="/registration" type="button" class="btn btn-primary">Sign-up</a>
+        </div>
+
+        <div class="d-flex align-items-center" th:if="${login != null}">
+            <h4 th:text="'User: ' + ${login}" style="margin-right: 30px">Login</h4>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn btn-primary">Logout</button>
+            </form>
+        </div>
+
+    </div>
+</div>

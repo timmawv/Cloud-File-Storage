@@ -1,0 +1,6 @@
+@import url('../pages/base.css');
+
+.container.main {
+    margin-top: 150px;
+    width: 30%;
+}

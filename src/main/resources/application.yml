@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: Cloud-File-Storage
+  devtools:
+    restart:
+      enabled: false
+  thymeleaf:
+    cache: false
+  mvc:
+    hidden-method:
+      filter:
+        enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  session:
+    timeout: 1800
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/main-changelog.xml
