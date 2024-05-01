@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: mysql_db
+    image: mysql:8.3
+    volumes:
+      - mysql_volume:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: file_storage
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_db
+    volumes:
+      - redis_volume:/data
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio_storage
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_volume:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: ["server", "/data", "--console-address", ":9001"]
+
+volumes:
+  mysql_volume:
+  redis_volume:
+  minio_volume:
