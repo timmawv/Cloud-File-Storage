@@ -17,7 +17,7 @@ public class MinioUtil {
             log.debug("You were authenticated in minio");
         } catch (MinioException e) {
             log.error("Please check your credentials in Minio");
-            throw new MinioClientNotAuthenticatedException("You are not authenticated in Minio");
+            throw new MinioClientNotAuthenticatedException("Something went wrong with file storage");
         } catch (Exception e) {
             e.printStackTrace();
         }

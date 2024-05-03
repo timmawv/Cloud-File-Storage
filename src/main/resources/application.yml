@@ -31,3 +31,6 @@ spring:
   liquibase:
     enabled: false
     change-log: db/changelog/main-changelog.xml
+  servlet:
+    multipart:
+      max-file-size: 10MB

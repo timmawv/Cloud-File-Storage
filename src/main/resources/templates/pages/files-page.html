@@ -16,11 +16,13 @@
 <main>
     <div class="container main">
         <h1>Upload file to server</h1>
-        <div class="drop-zone">
-            <span class="drop-zone__prompt">Drop file here or click to upload</span>
-            <input type="file" name="myFile" class="drop-zone__input">
-        </div>
-        <button class="btn btn-primary send-file">Send file to server</button>
+        <form action="/files" method="post" enctype="multipart/form-data">
+            <div class="drop-zone">
+                <span class="drop-zone__prompt">Drop file here or click to upload</span>
+                <input type="file" name="file" class="drop-zone__input">
+            </div>
+            <button class="btn btn-primary send-file">Send file to server</button>
+        </form>
     </div>
 </main>
 
