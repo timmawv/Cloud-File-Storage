@@ -1,6 +1,9 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
+import avlyakulov.timur.CloudFileStorage.csv_parser.CsvFileParser;
+import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
 import avlyakulov.timur.CloudFileStorage.minio.MinioService;
 import io.minio.Result;
 import io.minio.messages.Item;
@@ -12,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -21,9 +26,12 @@ public class FilesController {
 
     private MinioService minioService;
 
+    private FileMapper fileMapper;
+
     @Autowired
-    public FilesController(MinioService minioService) {
+    public FilesController(MinioService minioService, FileMapper fileMapper) {
         this.minioService = minioService;
+        this.fileMapper = fileMapper;
     }
 
     @GetMapping
@@ -39,16 +47,16 @@ public class FilesController {
             pathFromUrl = path.get().concat("/");
 
         Iterable<Result<Item>> objectsFromStorage = minioService.getObjectsFromStorage(personDetails.getUserId(), pathFromUrl);
-
-        objectsFromStorage.forEach(f -> {
+        List<Item> filesInDir = new ArrayList<>();
+        for (Result<Item> item : objectsFromStorage) {
             try {
-                System.out.println(f.get().objectName());
-
-                System.out.println(f.get().isDir());
+                filesInDir.add(item.get());
             } catch (Exception e) {
-                log.error("Error minio in controller");
+                log.error("Error during adding file to list in controller");
             }
-        });
+        }
+        List<FileResponse> fileResponses = fileMapper.mapFileToResponse(filesInDir);
+        model.addAttribute("files", fileResponses);
         return "pages/files-page";
     }
 

@@ -70,24 +70,21 @@ function updateThumbnail(dropZoneElement, file) {
     }
 }
 
-// document.querySelector('.send-file').addEventListener('click', function(event) {
-//
-//     const files = document.querySelector('.drop-zone__input').files; // Получаем выбранные файлы
-//     const formData = new FormData(); // Создаем объект FormData для отправки файлов
-//
-//     for (var i = 0; i < files.length; i++) {
-//         formData.append('file', files[i]); // Добавляем каждый файл в FormData
-//     }
-//
-//     const xhr = new XMLHttpRequest();
-//     xhr.open('POST', '/files', true);
-//     xhr.onload = function() {
-//         // Обработка ответа сервера
-//         if (xhr.status === 200) {
-//             console.log('Файлы успешно загружены на сервер');
-//         } else {
-//             console.error('Произошла ошибка при загрузке файлов');
-//         }
-//     };
-//     xhr.send(formData); // Отправляем FormData на сервер
-// });
+document.querySelector(".clear-file").addEventListener("click", () => {
+    const dropZoneElement = document.querySelector(".drop-zone");
+    const inputElement = dropZoneElement.querySelector(".drop-zone__input");
+
+    // Очищаем значение поля ввода файлов и удаляем миниатюру
+    inputElement.value = "";
+    if (dropZoneElement.querySelector(".drop-zone__thumb")) {
+        dropZoneElement.querySelector(".drop-zone__thumb").remove();
+    }
+
+    // Если после этого остался текст "Drop file here or click to upload", добавляем его обратно
+    if (!dropZoneElement.querySelector(".drop-zone__prompt")) {
+        const promptElement = document.createElement("span");
+        promptElement.classList.add("drop-zone__prompt");
+        promptElement.textContent = "Drop file here or click to upload";
+        dropZoneElement.appendChild(promptElement);
+    }
+});

@@ -28,7 +28,6 @@ public class MinioService {
         MinioUtil.checkAuthMinio(minioClient);
         createMainBucketIfItNotExist();
         String userDirectoryFormatted = String.format(userDirectory, userId).concat("/".concat(file.getOriginalFilename()));
-        int a = 123;
         createFileWithUserDirectory(file, userDirectoryFormatted);
     }
 
@@ -43,6 +42,7 @@ public class MinioService {
         return results;
     }
 
+    //todo refactor it to minioUtil
     private void createMainBucketIfItNotExist() {
         try {
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(usersBucketName).build());
