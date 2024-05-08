@@ -16,4 +16,6 @@ public class FileResponse {
     private Boolean directory;
 
     private String fileIcon;
+
+    private String file;
 }

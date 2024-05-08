@@ -2,11 +2,16 @@ package avlyakulov.timur.CloudFileStorage.minio;
 
 import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
 import io.minio.*;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -24,11 +29,13 @@ public class MinioService {
         this.minioClient = minioClient;
     }
 
-    public void uploadFile(MultipartFile file, Integer userId) {
+    public void uploadFile(MultipartFile[] files, Integer userId) {
         MinioUtil.checkAuthMinio(minioClient);
         createMainBucketIfItNotExist();
-        String userDirectoryFormatted = String.format(userDirectory, userId).concat("/".concat(file.getOriginalFilename()));
-        createFileWithUserDirectory(file, userDirectoryFormatted);
+        for (MultipartFile file : files) {
+            String userDirectoryFormatted = String.format(userDirectory, userId).concat("/".concat(file.getOriginalFilename()));
+            createFileWithUserDirectory(file, userDirectoryFormatted);
+        }
     }
 
     public Iterable<Result<Item>> getObjectsFromStorage(Integer userId, String path) {
@@ -40,6 +47,27 @@ public class MinioService {
                         .prefix(userDirectoryFormatted)
                         .build());
         return results;
+    }
+
+    public void deleteFile(String filePath, Integer userId) {
+        String userFilePath = String.format(userDirectory, userId).concat(filePath);
+        List<DeleteObject> objects = new LinkedList<>();
+        objects.add(new DeleteObject(userFilePath));
+        Iterable<Result<DeleteError>> results = minioClient
+                .removeObjects(
+                        RemoveObjectsArgs
+                                .builder()
+                                .bucket(usersBucketName)
+                                .objects(objects)
+                                .build());
+        for (Result<DeleteError> result : results) {
+            try {
+                DeleteError error = result.get();
+                System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //todo refactor it to minioUtil

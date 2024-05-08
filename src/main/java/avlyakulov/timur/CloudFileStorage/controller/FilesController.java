@@ -1,7 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
-import avlyakulov.timur.CloudFileStorage.csv_parser.CsvFileParser;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
 import avlyakulov.timur.CloudFileStorage.minio.MinioService;
@@ -38,8 +37,6 @@ public class FilesController {
     public String getFilesPage(@AuthenticationPrincipal PersonDetails personDetails,
                                @RequestParam(name = "path", required = false) Optional<String> path,
                                Model model) {
-        if (personDetails == null)
-            return "/pages/main-page";
         model.addAttribute("login", personDetails.getUsername());
 
         String pathFromUrl = "/";
@@ -62,9 +59,17 @@ public class FilesController {
 
     @PostMapping
     public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails,
-                                     @RequestPart("file") MultipartFile file) {
+                                     @RequestPart("file") MultipartFile[] files) {
         Integer userId = personDetails.getUserId();
-        minioService.uploadFile(file, userId);
+        minioService.uploadFile(files, userId);
+        return "redirect:/files";
+    }
+
+    @DeleteMapping
+    public String deleteFile(@AuthenticationPrincipal PersonDetails personDetails, @ModelAttribute("file") String fileName) {
+        String pathFromUrl = "/";
+        String pathFileName = pathFromUrl.concat(fileName);
+        minioService.deleteFile(pathFileName, personDetails.getUserId());
         return "redirect:/files";
     }
 }

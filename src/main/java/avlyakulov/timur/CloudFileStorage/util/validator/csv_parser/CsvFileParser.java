@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.csv_parser;
+package avlyakulov.timur.CloudFileStorage.util.validator.csv_parser;
 
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import com.opencsv.CSVReader;

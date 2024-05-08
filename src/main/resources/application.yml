@@ -1,15 +1,13 @@
 spring:
   application:
     name: Cloud-File-Storage
-  devtools:
-    restart:
-      enabled: false
-  thymeleaf:
-    cache: false
   mvc:
     hidden-method:
       filter:
         enabled: true
+  devtools:
+    restart:
+      enabled: false
   data:
     redis:
       host: localhost

@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.mapper;
 
-import avlyakulov.timur.CloudFileStorage.csv_parser.CsvFileParser;
+import avlyakulov.timur.CloudFileStorage.util.validator.csv_parser.CsvFileParser;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.util.validator.FileSizeConverter;
 import io.minio.messages.Item;

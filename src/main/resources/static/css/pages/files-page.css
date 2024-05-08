@@ -7,17 +7,35 @@
 }
 
 .file {
+    margin-top: 40px;
     border: 2px solid black;
     border-radius: 15px;
     padding: 15px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    column-gap: 30px;
+}
+
+.file .header {
+    margin: auto;
+}
+
+.file .file_icon {
+    margin: auto;
+    padding: 10px;
 }
 
 .file_icon {
     width: 150px;
     height: 150px;
+}
+
+.file p {
+    font-size: 20px;
+}
+
+.dropdown-menu li {
+    cursor: pointer;
 }
 
 .drop-zone {
