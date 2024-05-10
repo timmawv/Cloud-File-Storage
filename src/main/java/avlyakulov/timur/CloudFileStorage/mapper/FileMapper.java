@@ -25,18 +25,29 @@ public interface FileMapper {
 
     @BeforeMapping
     default void convertDateToPattern(Item item, @MappingTarget FileResponse fileResponse) {
-        ZonedDateTime lastModified = item.lastModified();
-        lastModified = lastModified.withZoneSameInstant(ZoneId.of("Europe/Kiev"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy, HH:mm");
-        String lastModifiedFormatted = lastModified.format(formatter);
-        fileResponse.setLastModified(lastModifiedFormatted);
+        if (!item.isDir()) {
+            ZonedDateTime lastModified = item.lastModified();
+            lastModified = lastModified.withZoneSameInstant(ZoneId.of("Europe/Kiev"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy, HH:mm");
+            String lastModifiedFormatted = lastModified.format(formatter);
+            fileResponse.setLastModified(lastModifiedFormatted);
+        }
     }
 
     @AfterMapping
     default void convertFile(@MappingTarget FileResponse fileResponse) {
+        if (!fileResponse.isDirectory()) {
+            setFileName(fileResponse);
+            fileResponse.setSize(FileSizeConverter.convertFileSize(fileResponse.getSize()));
+        } else {
+            String[] files = fileResponse.getObjectName().split("/");
+            fileResponse.setObjectName(files[files.length - 1]);
+        }
+    }
+
+    private void setFileName(FileResponse fileResponse) {
         int indexPath = fileResponse.getObjectName().lastIndexOf("/");
         fileResponse.setObjectName(fileResponse.getObjectName().substring(indexPath + 1));
-        fileResponse.setSize(FileSizeConverter.convertFileSize(fileResponse.getSize()));
     }
 
     List<FileResponse> mapFileToResponse(List<Item> files);

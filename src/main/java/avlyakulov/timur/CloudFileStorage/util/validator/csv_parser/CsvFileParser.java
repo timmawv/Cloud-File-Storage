@@ -24,7 +24,6 @@ public class CsvFileParser {
     }
 
     private static void fillFileFormats() {
-
         try (CSVReader reader = new CSVReader(new FileReader(FILE_NAME))) {
             String[] nextRecord;
             reader.readNext();
@@ -39,7 +38,11 @@ public class CsvFileParser {
     public static FileResponse setFileFormatForFile(FileResponse fileResponse) {
         int lastIndexFormat = fileResponse.getObjectName().lastIndexOf(".");
         String fileFormat = fileResponse.getObjectName().substring(lastIndexFormat + 1).toLowerCase();
-        fileResponse.setFileIcon(fileFormats.getOrDefault(fileFormat, defaultUrlFile));
+        if (!fileResponse.isDirectory()) {
+            fileResponse.setFileIcon(fileFormats.getOrDefault(fileFormat, defaultUrlFile));
+            return fileResponse;
+        }
+        fileResponse.setFileIcon(fileFormats.getOrDefault("directory", defaultUrlFile));
         return fileResponse;
     }
 }

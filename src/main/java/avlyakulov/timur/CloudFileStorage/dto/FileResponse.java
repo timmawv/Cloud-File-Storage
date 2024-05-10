@@ -13,9 +13,7 @@ public class FileResponse {
 
     private String lastModified;
 
-    private Boolean directory;
+    private boolean directory;
 
     private String fileIcon;
-
-    private String file;
 }

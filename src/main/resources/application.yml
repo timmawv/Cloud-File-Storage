@@ -1,10 +1,6 @@
 spring:
   application:
     name: Cloud-File-Storage
-  mvc:
-    hidden-method:
-      filter:
-        enabled: true
   devtools:
     restart:
       enabled: false

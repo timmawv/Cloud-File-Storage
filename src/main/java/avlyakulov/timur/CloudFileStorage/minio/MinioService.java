@@ -2,16 +2,11 @@ package avlyakulov.timur.CloudFileStorage.minio;
 
 import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
 import io.minio.*;
-import io.minio.messages.DeleteError;
-import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.LinkedList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -51,24 +46,34 @@ public class MinioService {
 
     public void deleteFile(String filePath, Integer userId) {
         String userFilePath = String.format(userDirectory, userId).concat(filePath);
-        List<DeleteObject> objects = new LinkedList<>();
-        objects.add(new DeleteObject(userFilePath));
-        Iterable<Result<DeleteError>> results = minioClient
-                .removeObjects(
-                        RemoveObjectsArgs
-                                .builder()
-                                .bucket(usersBucketName)
-                                .objects(objects)
-                                .build());
-        for (Result<DeleteError> result : results) {
-            try {
-                DeleteError error = result.get();
-                System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
+        } catch (Exception e) {
+            log.error("Error during deleting file");
         }
     }
+
+    public void updateFileName(String pathNewFileName, String pathOldFileName, Integer userId) {
+        String updateFileName = String.format(userDirectory, userId).concat(pathNewFileName);
+        String oldFileName = String.format(userDirectory, userId).concat(pathOldFileName);
+        try {
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(usersBucketName)
+                            .object(updateFileName)
+                            .source(
+                                    CopySource.builder()
+                                            .bucket(usersBucketName)
+                                            .object(oldFileName)
+                                            .build())
+                            .build());
+        } catch (Exception e) {
+            log.error("Error during copying object");
+            return;
+        }
+        deleteFile(pathOldFileName, userId);
+    }
+
 
     //todo refactor it to minioUtil
     private void createMainBucketIfItNotExist() {

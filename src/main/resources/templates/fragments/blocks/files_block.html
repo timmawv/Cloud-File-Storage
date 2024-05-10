@@ -1,3 +1,37 @@
-<!--<div th:fragment="files">-->
-<!--  <div th:each="file : ${files}"></div>-->
-<!--</div>-->
+<div class="file_wrapper" th:fragment="files">
+    <div class="file" th:each="file, iterStat : ${files}">
+
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Action with file</button>
+            <ul class="dropdown-menu">
+                <li data-bs-toggle="modal" th:data-bs-target="'#renameFileModal' + ${iterStat.index + 1}"><a class="dropdown-item">Rename file</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li data-bs-toggle="modal" th:data-bs-target="'#deleteFileModal' + ${iterStat.index + 1}"><a class="dropdown-item">Delete file</a></li>
+            </ul>
+        </div>
+
+        <div th:replace="~{fragments/modals/modal-delete-file :: modal-delete}"></div>
+        <div th:replace="~{fragments/modals/modal-rename-file :: modal-rename}"></div>
+
+        <div th:unless="${file.isDirectory()}">
+            <h3 class="header" th:if="${#strings.length(file.getObjectName()) >= 18}" data-bs-toggle="tooltip"
+                th:title="${file.getObjectName()}"
+                th:text="${#strings.substring(file.getObjectName(), 0, 18) + '...'}"></h3>
+            <h3 class="header" th:if="${#strings.length(file.getObjectName()) < 18}"
+                th:text="${file.getObjectName()}"></h3>
+            <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
+            <p th:text="'Size: ' + ${file.getSize()}"></p>
+            <p th:text="'Last modified: ' + ${file.getLastModified()}"></p>
+        </div>
+
+        <div th:if="${file.isDirectory()}">
+            <h3 class="header" th:if="${#strings.length(file.getObjectName()) >= 18}" data-bs-toggle="tooltip"
+                th:title="${file.getObjectName()}"
+                th:text="${#strings.substring(file.getObjectName(), 0, 18) + '...'}"></h3>
+            <h3 class="header" th:if="${#strings.length(file.getObjectName()) < 18}"
+                th:text="${file.getObjectName()}"></h3>
+            <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
+        </div>
+
+    </div>
+</div>
