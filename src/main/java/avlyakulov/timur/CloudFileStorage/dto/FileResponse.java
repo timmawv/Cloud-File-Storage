@@ -9,6 +9,10 @@ public class FileResponse {
 
     private String objectName;
 
+    private String filePath;
+
+    private String fileType;
+
     private String size;
 
     private String lastModified;

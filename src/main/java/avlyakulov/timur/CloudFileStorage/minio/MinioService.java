@@ -1,103 +1,75 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
-import io.minio.*;
+import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
+import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
+import avlyakulov.timur.CloudFileStorage.util.converter.FileNameConverter;
+import avlyakulov.timur.CloudFileStorage.util.converter.FileSizeConverter;
+import avlyakulov.timur.CloudFileStorage.util.csv_parser.CsvFileParser;
 import io.minio.messages.Item;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MinioService {
 
-    private MinioClient minioClient;
+    private final MinioUtil minioUtil;
 
-    private String userDirectory = "user-%d-files";
-
-    private String usersBucketName = "user-files";
-
-
-    @Autowired
-    public MinioService(MinioClient minioClient) {
-        this.minioClient = minioClient;
-    }
+    private final FileMapper fileMapper;
 
     public void uploadFile(MultipartFile[] files, Integer userId) {
-        MinioUtil.checkAuthMinio(minioClient);
-        createMainBucketIfItNotExist();
-        for (MultipartFile file : files) {
-            String userDirectoryFormatted = String.format(userDirectory, userId).concat("/".concat(file.getOriginalFilename()));
-            createFileWithUserDirectory(file, userDirectoryFormatted);
-        }
+        minioUtil.uploadFile(files, userId);
     }
 
-    public Iterable<Result<Item>> getObjectsFromStorage(Integer userId, String path) {
-        String userDirectoryFormatted = String.format(userDirectory, userId).concat(path);
-        Iterable<Result<Item>> results = minioClient.listObjects(
-                ListObjectsArgs
-                        .builder()
-                        .bucket(usersBucketName)
-                        .prefix(userDirectoryFormatted)
-                        .build());
-        return results;
+    public List<FileResponse> getUserFiles(Integer userId, String path) {
+        List<Item> objectsFromStorage = minioUtil.getObjectsFromPath(userId, path);
+        List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
+        fileResponses.forEach(FileNameConverter::convertFileName);
+        fileResponses.forEach(FileSizeConverter::convertFileSize);
+        fileResponses.forEach(CsvFileParser::setFileIconForFile);
+        return fileResponses;
     }
 
-    public void deleteFile(String filePath, Integer userId) {
-        String userFilePath = String.format(userDirectory, userId).concat(filePath);
-        try {
-            minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
-        } catch (Exception e) {
-            log.error("Error during deleting file");
-        }
-    }
-
-    public void updateFileName(String pathNewFileName, String pathOldFileName, Integer userId) {
-        String updateFileName = String.format(userDirectory, userId).concat(pathNewFileName);
-        String oldFileName = String.format(userDirectory, userId).concat(pathOldFileName);
-        try {
-            minioClient.copyObject(
-                    CopyObjectArgs.builder()
-                            .bucket(usersBucketName)
-                            .object(updateFileName)
-                            .source(
-                                    CopySource.builder()
-                                            .bucket(usersBucketName)
-                                            .object(oldFileName)
-                                            .build())
-                            .build());
-        } catch (Exception e) {
-            log.error("Error during copying object");
-            return;
-        }
-        deleteFile(pathOldFileName, userId);
+    public String deleteFile(String filePath, Integer userId) {
+        minioUtil.deleteFile(filePath, userId);
+        return getPathToFileDirectory(filePath);
     }
 
 
-    //todo refactor it to minioUtil
-    private void createMainBucketIfItNotExist() {
-        try {
-            boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(usersBucketName).build());
-            if (!found)
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(usersBucketName).build());
-        } catch (Exception e) {
-            log.error("something went wrong with minio while was creating main bucket");
-            throw new MinioGlobalFileException("Something went wrong with minio");
+    public String updateFileName(UpdateFileNameDto updateFileNameDto, Integer userId) {
+        String oldFilePath = updateFileNameDto.getOldFilePath();
+        String newFileName = updateFileNameDto.getNewFileName();
+        String oldFileName = updateFileNameDto.getOldFileName();
+        String pathToFile = "";
+
+        if (oldFilePath.contains("/")) {
+            int lastIndexOfSlash = oldFilePath.lastIndexOf("/");
+            pathToFile = oldFilePath.substring(0, lastIndexOfSlash);
         }
+
+        if (!updateFileNameDto.getIsFileDirectory()) {
+            int indexOfDot = oldFileName.lastIndexOf(".");
+            String newFilePath = oldFilePath.replace(oldFileName.substring(0, indexOfDot), newFileName);
+            minioUtil.copyFileWithNewName(newFilePath, oldFilePath, userId);
+            deleteFile(oldFilePath, userId);
+            return pathToFile;
+        }
+        String newFilePath = oldFilePath.replace(oldFileName, newFileName);
+        minioUtil.copyFileWithNewName(newFilePath, oldFilePath, userId);
+        return pathToFile;
     }
 
-    private void createFileWithUserDirectory(MultipartFile file, String userDirectory) {
-        try {
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(usersBucketName)
-                            .object(userDirectory)
-                            .stream(file.getInputStream(), -1, 10485760)
-                            .build());
-
-        } catch (Exception e) {
-            log.error("something went wrong with minio while was creating user directory");
+    private String getPathToFileDirectory(String filePath) {
+        if (filePath.contains("/")) {
+            int lastIndexOfSlash = filePath.lastIndexOf("/");
+            return filePath.substring(0, lastIndexOfSlash + 1);
         }
+        return "";
     }
 }

@@ -5,7 +5,7 @@ import avlyakulov.timur.CloudFileStorage.dto.UserDto;
 import avlyakulov.timur.CloudFileStorage.service.UserService;
 import avlyakulov.timur.CloudFileStorage.util.validator.LoginAndPasswordValidator;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,17 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/registration")
 @PreAuthorize("isAnonymous()")
+@RequiredArgsConstructor
 public class RegisterController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    private LoginAndPasswordValidator loginAndPasswordValidator;
+    private final LoginAndPasswordValidator loginAndPasswordValidator;
 
-    @Autowired
-    public RegisterController(UserService userService, LoginAndPasswordValidator loginAndPasswordValidator) {
-        this.userService = userService;
-        this.loginAndPasswordValidator = loginAndPasswordValidator;
-    }
 
     @GetMapping
     public String getRegisterPage(Model model) {

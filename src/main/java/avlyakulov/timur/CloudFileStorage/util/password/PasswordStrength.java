@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.util.validator.password;
+package avlyakulov.timur.CloudFileStorage.util.password;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

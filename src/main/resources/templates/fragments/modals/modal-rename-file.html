@@ -7,8 +7,10 @@
             </div>
             <div class="modal-body">
                 <p>Enter new name of file</p>
-                <form th:method="PATCH" th:action="@{/files}" onsubmit="return prepareForm()">
-                    <label><input type="text" id="file" name="newFileName"></label>
+                <form th:method="PATCH" name="renameFileForm" th:action="@{/files}" onsubmit="return prepareForm(this)">
+                    <label><input type="text" id="file" name="newFileName" required></label>
+                    <input type="hidden" name="oldFilePath" th:value="${file.getFilePath()}">
+                    <input type="hidden" name="isFileDirectory" th:value="${file.isDirectory()}">
                     <input type="hidden" name="oldFileName" th:value="${file.getObjectName()}">
                     <button type="submit" class="btn btn-primary">Rename File</button>
                 </form>
@@ -17,7 +19,6 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Сlose</button>
-
             </div>
         </div>
     </div>

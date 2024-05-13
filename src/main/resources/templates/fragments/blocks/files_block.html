@@ -25,11 +25,7 @@
         </div>
 
         <div th:if="${file.isDirectory()}">
-            <h3 class="header" th:if="${#strings.length(file.getObjectName()) >= 18}" data-bs-toggle="tooltip"
-                th:title="${file.getObjectName()}"
-                th:text="${#strings.substring(file.getObjectName(), 0, 18) + '...'}"></h3>
-            <h3 class="header" th:if="${#strings.length(file.getObjectName()) < 18}"
-                th:text="${file.getObjectName()}"></h3>
+            <h3 class="header"><a th:href="'files?path=' + ${file.getFilePath()}" th:text="${file.getObjectName()}"></a></h3>
             <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
         </div>
 

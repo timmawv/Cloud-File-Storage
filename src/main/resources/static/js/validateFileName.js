@@ -7,7 +7,7 @@ function prepareForm(form) {
         return false;
     }
 
-    if (fileValue.includes(" ") || fileValue.includes(".")) {
+    if (fileValue.includes(".")) {
         document.getElementById("error").textContent = "File name can't contain dots or spaces.";
         return false;
     }

@@ -1,8 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.mapper;
 
-import avlyakulov.timur.CloudFileStorage.util.validator.csv_parser.CsvFileParser;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
-import avlyakulov.timur.CloudFileStorage.util.validator.FileSizeConverter;
 import io.minio.messages.Item;
 import org.mapstruct.*;
 
@@ -14,12 +12,12 @@ import java.util.List;
 @Mapper
 public interface FileMapper {
 
-    @Mapping(target = "objectName", expression = "java(item.objectName())")
+    @Mapping(target = "filePath", expression = "java(item.objectName())")
     @Mapping(target = "directory", expression = "java(item.isDir())")
     FileResponse mapItemToResponse(Item item);
 
     @BeforeMapping
-    default void convertFileSize(Item item, @MappingTarget FileResponse fileResponse) {
+    default void convertFileSizeToString(Item item, @MappingTarget FileResponse fileResponse) {
         fileResponse.setSize(String.valueOf(item.size()));
     }
 
@@ -34,26 +32,5 @@ public interface FileMapper {
         }
     }
 
-    @AfterMapping
-    default void convertFile(@MappingTarget FileResponse fileResponse) {
-        if (!fileResponse.isDirectory()) {
-            setFileName(fileResponse);
-            fileResponse.setSize(FileSizeConverter.convertFileSize(fileResponse.getSize()));
-        } else {
-            String[] files = fileResponse.getObjectName().split("/");
-            fileResponse.setObjectName(files[files.length - 1]);
-        }
-    }
-
-    private void setFileName(FileResponse fileResponse) {
-        int indexPath = fileResponse.getObjectName().lastIndexOf("/");
-        fileResponse.setObjectName(fileResponse.getObjectName().substring(indexPath + 1));
-    }
-
-    List<FileResponse> mapFileToResponse(List<Item> files);
-
-    @AfterMapping
-    default void addUrlIconFile(@MappingTarget List<FileResponse> fileResponses) {
-        fileResponses = fileResponses.stream().map(CsvFileParser::setFileFormatForFile).toList();
-    }
+    List<FileResponse> mapListItemsFromStorageToListFileResponse(List<Item> files);
 }
