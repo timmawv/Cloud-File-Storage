@@ -1,6 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
+import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
 import avlyakulov.timur.CloudFileStorage.minio.MinioService;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -32,13 +34,18 @@ public class FileController {
         String pathFromUrl = path.orElse("");
         List<FileResponse> files = minioService.getUserFiles(personDetails.getUserId(), pathFromUrl);
         model.addAttribute("files", files);
+        model.addAttribute("path", pathFromUrl);
         return "pages/files-page";
     }
 
     @PostMapping
-    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails, @RequestPart("file") MultipartFile[] files) {
-        minioService.uploadFile(files, personDetails.getUserId());
-        return "redirect:/files";
+    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails,
+                                     @RequestPart("file") MultipartFile[] files,
+                                     @RequestParam(name = "path") String pathFromUrl) {
+        int a = 123;
+        CreateFileDto createFileDto = new CreateFileDto(pathFromUrl, files);
+        minioService.uploadFile(createFileDto, personDetails.getUserId());
+        return "redirect:/files?path=".concat(encodePathToFile(pathFromUrl));
     }
 
     @DeleteMapping

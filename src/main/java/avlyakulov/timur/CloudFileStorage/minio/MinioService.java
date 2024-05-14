@@ -1,5 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
+import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
 import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
@@ -19,16 +20,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MinioService {
 
-    private final MinioUtil minioUtil;
+    private final MinioRepository minioRepository;
 
     private final FileMapper fileMapper;
 
-    public void uploadFile(MultipartFile[] files, Integer userId) {
-        minioUtil.uploadFile(files, userId);
+    public void uploadFile(CreateFileDto createFileDto, Integer userId) {
+        MultipartFile[] files = createFileDto.getFiles();
+        String path = createFileDto.getPath();
+        minioRepository.uploadFile(path, files, userId);
     }
 
     public List<FileResponse> getUserFiles(Integer userId, String path) {
-        List<Item> objectsFromStorage = minioUtil.getObjectsFromPath(userId, path);
+        List<Item> objectsFromStorage = minioRepository.getObjectsFromPath(userId, path);
         List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
         fileResponses.forEach(FileNameConverter::convertFileName);
         fileResponses.forEach(FileSizeConverter::convertFileSize);
@@ -37,7 +40,7 @@ public class MinioService {
     }
 
     public String deleteFile(String filePath, Integer userId) {
-        minioUtil.deleteFile(filePath, userId);
+        minioRepository.deleteFile(filePath, userId);
         return getPathToFileDirectory(filePath);
     }
 
@@ -56,12 +59,12 @@ public class MinioService {
         if (!updateFileNameDto.getIsFileDirectory()) {
             int indexOfDot = oldFileName.lastIndexOf(".");
             String newFilePath = oldFilePath.replace(oldFileName.substring(0, indexOfDot), newFileName);
-            minioUtil.copyFileWithNewName(newFilePath, oldFilePath, userId);
+            minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
             deleteFile(oldFilePath, userId);
             return pathToFile;
         }
         String newFilePath = oldFilePath.replace(oldFileName, newFileName);
-        minioUtil.copyFileWithNewName(newFilePath, oldFilePath, userId);
+        minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
         return pathToFile;
     }
 

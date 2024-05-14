@@ -25,11 +25,9 @@ public class RegisterController {
 
     private final LoginAndPasswordValidator loginAndPasswordValidator;
 
-
     @GetMapping
     public String getRegisterPage(Model model) {
-        UserDto userDto = new UserDto();
-        model.addAttribute("user", userDto);
+        model.addAttribute("user", new UserDto());
         return "/auth/registration";
     }
 

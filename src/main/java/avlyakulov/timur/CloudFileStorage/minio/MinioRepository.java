@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MinioUtil {
+public class MinioRepository {
 
     private final MinioClient minioClient;
     private final String userDirectory = "user-%d-files/";
@@ -42,9 +42,9 @@ public class MinioUtil {
         return filesInDir;
     }
 
-    public void uploadFile(MultipartFile[] files, Integer userId) {
+    public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
         for (MultipartFile file : files) {
-            String userDirectoryFormatted = String.format(userDirectory, userId).concat(file.getOriginalFilename());
+            String userDirectoryFormatted = String.format(userDirectory, userId).concat(pathToFile.concat(file.getOriginalFilename()));
             createFile(file, userDirectoryFormatted);
         }
     }
