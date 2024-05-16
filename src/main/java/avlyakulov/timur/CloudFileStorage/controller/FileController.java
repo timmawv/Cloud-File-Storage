@@ -5,6 +5,7 @@ import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
 import avlyakulov.timur.CloudFileStorage.minio.MinioService;
+import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -35,6 +35,11 @@ public class FileController {
         List<FileResponse> files = minioService.getUserFiles(personDetails.getUserId(), pathFromUrl);
         model.addAttribute("files", files);
         model.addAttribute("path", pathFromUrl);
+        if (pathFromUrl.isBlank()) {
+            return "pages/files-page";
+        }
+        String[] links = PathToBreadcrumbConverter.convertPathToBreadcrumb(pathFromUrl);
+        model.addAttribute("pathList", links);
         return "pages/files-page";
     }
 
@@ -42,15 +47,14 @@ public class FileController {
     public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails,
                                      @RequestPart("file") MultipartFile[] files,
                                      @RequestParam(name = "path") String pathFromUrl) {
-        int a = 123;
         CreateFileDto createFileDto = new CreateFileDto(pathFromUrl, files);
         minioService.uploadFile(createFileDto, personDetails.getUserId());
         return "redirect:/files?path=".concat(encodePathToFile(pathFromUrl));
     }
 
     @DeleteMapping
-    public String deleteFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("file") String filePath) {
-        String pathToFileDirectory = minioService.deleteFile(filePath, personDetails.getUserId());
+    public String deleteFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("isDir") Boolean isDir, @RequestParam("file") String filePath) {
+        String pathToFileDirectory = minioService.deleteFile(filePath, isDir, personDetails.getUserId());
         return "redirect:/files?path=".concat(encodePathToFile(pathToFileDirectory));
     }
 

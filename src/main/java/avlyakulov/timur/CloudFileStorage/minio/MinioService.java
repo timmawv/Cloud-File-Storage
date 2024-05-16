@@ -39,9 +39,9 @@ public class MinioService {
         return fileResponses;
     }
 
-    public String deleteFile(String filePath, Integer userId) {
-        minioRepository.deleteFile(filePath, userId);
-        return getPathToFileDirectory(filePath);
+    public String deleteFile(String filePath, Boolean isDir, Integer userId) {
+        minioRepository.deleteFile(filePath, isDir, userId);
+        return getPathToFileDirectory(filePath, isDir);
     }
 
 
@@ -60,7 +60,7 @@ public class MinioService {
             int indexOfDot = oldFileName.lastIndexOf(".");
             String newFilePath = oldFilePath.replace(oldFileName.substring(0, indexOfDot), newFileName);
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
-            deleteFile(oldFilePath, userId);
+            deleteFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
             return pathToFile;
         }
         String newFilePath = oldFilePath.replace(oldFileName, newFileName);
@@ -68,7 +68,14 @@ public class MinioService {
         return pathToFile;
     }
 
-    private String getPathToFileDirectory(String filePath) {
+    private String getPathToFileDirectory(String filePath, Boolean isDir) {
+        //todo make more better we can simplify this logic
+        if (isDir) {
+            long count = filePath.chars().filter(ch -> ch == '/').count();
+            if (count == 1)
+                return "";
+            return filePath.replaceAll("/[^/]+/$", "/");
+        }
         if (filePath.contains("/")) {
             int lastIndexOfSlash = filePath.lastIndexOf("/");
             return filePath.substring(0, lastIndexOfSlash + 1);

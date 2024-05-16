@@ -4,6 +4,8 @@ import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioClientNotAuthent
 import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
 import io.minio.*;
 import io.minio.errors.MinioException;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
@@ -49,13 +52,60 @@ public class MinioRepository {
         }
     }
 
-    public void deleteFile(String filePath, Integer userId) {
+    public void deleteFile(String filePath, Boolean isDir, Integer userId) {
         String userFilePath = String.format(userDirectory, userId).concat(filePath);
+        if (isDir)
+            removeDirectory(userFilePath);
+        else
+            removeFile(userFilePath);
+    }
+
+    private void removeFile(String userFilePath) {
         try {
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
         } catch (Exception e) {
             log.error("Error during deleting file");
         }
+    }
+
+    private void removeDirectory(String path) {
+        List<Item> files = getObjectsFromPathForDeletingDirectory(path);
+        List<DeleteObject> objects = new LinkedList<>();
+        files.forEach(f -> objects.add(new DeleteObject(f.objectName())));
+        Iterable<Result<DeleteError>> results =
+                minioClient.removeObjects(
+                        RemoveObjectsArgs.builder().bucket(usersBucketName).objects(objects).build());
+        for (Result<DeleteError> result : results) {
+            try {
+                DeleteError error = result.get();
+                System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private List<Item> getObjectsFromPathForDeletingDirectory(String path) {
+        Iterable<Result<Item>> results = minioClient.listObjects(
+                ListObjectsArgs
+                        .builder()
+                        .bucket("user-files")
+                        .prefix(path)
+                        .build());
+        List<Item> filesInDir = new ArrayList<>();
+        for (Result<Item> item : results) {
+            try {
+                if (item.get().isDir()) {
+                    List<Item> objectsFromPath = getObjectsFromPathForDeletingDirectory(item.get().objectName());
+                    filesInDir.addAll(objectsFromPath);
+                } else {
+                    filesInDir.add(item.get());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return filesInDir;
     }
 
     public void copyFileWithNewName(String pathNewFileName, String pathOldFileName, Integer userId) {

@@ -16,10 +16,18 @@
 
 <main>
     <div class="container main">
-        <h1>Upload file to server</h1>
-        <form th:replace="~{fragments/blocks/drop-zone :: upload-form}"></form>
+        <h3>Upload file to server</h3>
+        <div th:replace="~{fragments/modals/modal-upload-file :: modal-upload-file}"></div>
+        <div th:replace="~{fragments/modals/modal-upload-dir :: modal-upload-dir}"></div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadFileModal">Upload files to server</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDirModal">Upload directory to server</button>
+        <nav style="margin-top: 30px" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/files">Base Directory</a></li>
+                <li th:if="${pathList != null}" th:each="path : ${pathList}" class="breadcrumb-item"><a th:with="pathArray=${path.split('/')}" th:text="${pathArray[#lists.size(pathArray) - 1]}" th:href="'files?path=' + ${path}">Path</a></li>
+            </ol>
+        </nav>
         <div th:replace="~{fragments/blocks/files_block :: files}"></div>
-
     </div>
 </main>
 

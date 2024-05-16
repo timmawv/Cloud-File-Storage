@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform_login")
-                        .defaultSuccessUrl("/files")
+                        .defaultSuccessUrl("/files", true)
                         .failureUrl("/login?error")
                 ).logout(logout -> logout
                         .permitAll()
