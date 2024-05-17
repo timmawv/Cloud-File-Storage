@@ -10,9 +10,10 @@ import avlyakulov.timur.CloudFileStorage.util.csv_parser.CsvFileParser;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.List;
 
 @Slf4j
@@ -20,18 +21,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MinioService {
 
-    private final MinioRepository minioRepository;
+    private final FacadeMinioRepository minioRepository;
 
     private final FileMapper fileMapper;
 
     public void uploadFile(CreateFileDto createFileDto, Integer userId) {
-        MultipartFile[] files = createFileDto.getFiles();
-        String path = createFileDto.getPath();
-        minioRepository.uploadFile(path, files, userId);
+        minioRepository.uploadFile(createFileDto.getPath(), createFileDto.getFiles(), userId);
     }
 
-    public List<FileResponse> getUserFiles(Integer userId, String path) {
-        List<Item> objectsFromStorage = minioRepository.getObjectsFromPath(userId, path);
+    public List<FileResponse> getUserFiles(String path, Integer userId) {
+        List<Item> objectsFromStorage = minioRepository.getAllFilesFromPath(path, userId);
         List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
         fileResponses.forEach(FileNameConverter::convertFileName);
         fileResponses.forEach(FileSizeConverter::convertFileSize);
@@ -39,11 +38,14 @@ public class MinioService {
         return fileResponses;
     }
 
-    public String deleteFile(String filePath, Boolean isDir, Integer userId) {
-        minioRepository.deleteFile(filePath, isDir, userId);
-        return getPathToFileDirectory(filePath, isDir);
+    public String removeFile(String filePath, Boolean isDir, Integer userId) {
+        minioRepository.removeFile(filePath, isDir, userId);
+        return getPathToObjectsDirectory(filePath, isDir);
     }
 
+    public InputStream downloadFile(String filePath, Integer userId) {
+        return minioRepository.downloadFile(filePath, userId);
+    }
 
     public String updateFileName(UpdateFileNameDto updateFileNameDto, Integer userId) {
         String oldFilePath = updateFileNameDto.getOldFilePath();
@@ -53,22 +55,31 @@ public class MinioService {
 
         if (oldFilePath.contains("/")) {
             int lastIndexOfSlash = oldFilePath.lastIndexOf("/");
-            pathToFile = oldFilePath.substring(0, lastIndexOfSlash);
+            pathToFile = oldFilePath.substring(0, lastIndexOfSlash + 1);
         }
 
         if (!updateFileNameDto.getIsFileDirectory()) {
-            int indexOfDot = oldFileName.lastIndexOf(".");
-            String newFilePath = oldFilePath.replace(oldFileName.substring(0, indexOfDot), newFileName);
+            String newFilePath = "";
+            if (oldFileName.contains(".")) {
+                int indexOfDot = oldFileName.lastIndexOf(".");
+                newFilePath = pathToFile.concat(newFileName).concat(oldFileName.substring(indexOfDot));
+            } else {
+                newFilePath = pathToFile.concat(newFileName);
+            }
+            if (newFilePath.equals(oldFilePath)) {
+                return pathToFile;
+            }
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
-            deleteFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
+            removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
             return pathToFile;
         }
+        //todo make implementation for folder
         String newFilePath = oldFilePath.replace(oldFileName, newFileName);
         minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
         return pathToFile;
     }
 
-    private String getPathToFileDirectory(String filePath, Boolean isDir) {
+    private String getPathToObjectsDirectory(String filePath, Boolean isDir) {
         //todo make more better we can simplify this logic
         if (isDir) {
             long count = filePath.chars().filter(ch -> ch == '/').count();

@@ -4,28 +4,25 @@ import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioClientNotAuthent
 import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
 import io.minio.*;
 import io.minio.errors.MinioException;
-import io.minio.messages.DeleteError;
-import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
-@Component
+@Repository
 @RequiredArgsConstructor
 public class MinioRepository {
 
-    private final MinioClient minioClient;
-    private final String userDirectory = "user-%d-files/";
-    private final String usersBucketName = "user-files";
+    protected final MinioClient minioClient;
+    protected final String userDirectory = "user-%d-files/";
+    protected final String usersBucketName = "user-files";
 
-    public List<Item> getObjectsFromPath(Integer userId, String path) {
+    public List<Item> getObjectsFromPath(String path, Integer userId) {
         baseMinioConfiguration();
         String userDirectoryFormatted = String.format(userDirectory, userId).concat(path);
         Iterable<Result<Item>> results = minioClient.listObjects(
@@ -52,82 +49,6 @@ public class MinioRepository {
         }
     }
 
-    public void deleteFile(String filePath, Boolean isDir, Integer userId) {
-        String userFilePath = String.format(userDirectory, userId).concat(filePath);
-        if (isDir)
-            removeDirectory(userFilePath);
-        else
-            removeFile(userFilePath);
-    }
-
-    private void removeFile(String userFilePath) {
-        try {
-            minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
-        } catch (Exception e) {
-            log.error("Error during deleting file");
-        }
-    }
-
-    private void removeDirectory(String path) {
-        List<Item> files = getObjectsFromPathForDeletingDirectory(path);
-        List<DeleteObject> objects = new LinkedList<>();
-        files.forEach(f -> objects.add(new DeleteObject(f.objectName())));
-        Iterable<Result<DeleteError>> results =
-                minioClient.removeObjects(
-                        RemoveObjectsArgs.builder().bucket(usersBucketName).objects(objects).build());
-        for (Result<DeleteError> result : results) {
-            try {
-                DeleteError error = result.get();
-                System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private List<Item> getObjectsFromPathForDeletingDirectory(String path) {
-        Iterable<Result<Item>> results = minioClient.listObjects(
-                ListObjectsArgs
-                        .builder()
-                        .bucket("user-files")
-                        .prefix(path)
-                        .build());
-        List<Item> filesInDir = new ArrayList<>();
-        for (Result<Item> item : results) {
-            try {
-                if (item.get().isDir()) {
-                    List<Item> objectsFromPath = getObjectsFromPathForDeletingDirectory(item.get().objectName());
-                    filesInDir.addAll(objectsFromPath);
-                } else {
-                    filesInDir.add(item.get());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return filesInDir;
-    }
-
-    public void copyFileWithNewName(String pathNewFileName, String pathOldFileName, Integer userId) {
-        String updateFileName = String.format(userDirectory, userId).concat(pathNewFileName);
-        String oldFileName = String.format(userDirectory, userId).concat(pathOldFileName);
-        try {
-            minioClient.copyObject(
-                    CopyObjectArgs.builder()
-                            .bucket(usersBucketName)
-                            .object(updateFileName)
-                            .source(
-                                    CopySource.builder()
-                                            .bucket(usersBucketName)
-                                            .object(oldFileName)
-                                            .build())
-                            .build());
-        } catch (Exception e) {
-            log.error("Error during copying object");
-            e.printStackTrace();
-        }
-    }
-
     private void createFile(MultipartFile file, String userDirectory) {
         try {
             ObjectWriteResponse object = minioClient.putObject(
@@ -140,9 +61,7 @@ public class MinioRepository {
         } catch (Exception e) {
             log.error("something went wrong with minio while was creating user directory");
         }
-
     }
-
 
     private void baseMinioConfiguration() {
         checkAuthMinio();

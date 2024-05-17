@@ -1,14 +1,16 @@
 function prepareForm(form) {
-    const fileInput = form.querySelector('input[type="file"]');
+    const fileInput = form.querySelector('#file');
     const fileValue = fileInput.value;
 
-    if (!fileValue) {
-        document.getElementById("error").textContent = "File name can't be empty.";
+    const errorElement = form.querySelector('#errorFileName');
+
+    if (fileValue.trim() === "" || !fileValue || fileValue.includes(" ")) {
+        errorElement.textContent = "File name can't be empty or contain spaces.";
         return false;
     }
 
     if (fileValue.includes(".")) {
-        document.getElementById("error").textContent = "File name can't contain dots or spaces.";
+        errorElement.textContent = "File name can't contain dots.";
         return false;
     }
 }

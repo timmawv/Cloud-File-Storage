@@ -13,8 +13,8 @@
                     <input type="hidden" name="isFileDirectory" th:value="${file.isDirectory()}">
                     <input type="hidden" name="oldFileName" th:value="${file.getObjectName()}">
                     <button type="submit" class="btn btn-primary">Rename File</button>
+                    <p id="errorFileName" style="color: red;"></p>
                 </form>
-                <p id="error" style="color: red;"></p>
             </div>
 
             <div class="modal-footer">
