@@ -1,0 +1,23 @@
+<div th:fragment="modal-create-dir" class="modal fade" id="createDirModal" tabindex="-1"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create directory</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h3>Create empty directory</h3>
+        <form method="post" name="createDirForm" action="/files/directory" onsubmit="return prepareForm(this)">
+          <label><input type="text" id="file" name="dirName" required></label>
+          <input type="hidden" name="path" th:value="${path}">
+          <button type="submit" class="btn btn-primary">Create directory</button>
+          <p id="errorFileName" style="color: red;"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Сlose</button>
+      </div>
+    </div>
+  </div>
+</div>

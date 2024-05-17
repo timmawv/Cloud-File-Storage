@@ -1,25 +1,35 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.RemoveObjectsArgs;
-import io.minio.Result;
+import io.minio.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
 @Repository
-public class MinioDirRepository extends MinioRepository{
+public class MinioDirRepository extends MinioRepository {
 
     public MinioDirRepository(MinioClient minioClient) {
         super(minioClient);
+    }
+
+    public void createEmptyDirectory(String dirName, String pathToDir, Integer userId) {
+        String userDirectoryPath = String.format(userDirectory, userId).concat(pathToDir).concat(dirName.concat("/"));
+        try {
+            minioClient.putObject(
+                    PutObjectArgs.builder().bucket(usersBucketName).object(userDirectoryPath)
+                            .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
+                            .build());
+        } catch (Exception e) {
+            log.error("Error during creating empty directory");
+        }
     }
 
     public void removeDirectory(String filePath, Integer userId) {

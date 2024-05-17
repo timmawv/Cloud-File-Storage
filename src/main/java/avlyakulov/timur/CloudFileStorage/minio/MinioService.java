@@ -1,5 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
+import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
 import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
@@ -10,7 +11,6 @@ import avlyakulov.timur.CloudFileStorage.util.csv_parser.CsvFileParser;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -29,13 +29,29 @@ public class MinioService {
         minioRepository.uploadFile(createFileDto.getPath(), createFileDto.getFiles(), userId);
     }
 
+    public void uploadEmptyDir(CreateDirRequest createDirRequest, Integer userId) {
+        minioRepository.uploadEmptyDir(createDirRequest.getDirName(), createDirRequest.getPath(), userId);
+    }
+
     public List<FileResponse> getUserFiles(String path, Integer userId) {
         List<Item> objectsFromStorage = minioRepository.getAllFilesFromPath(path, userId);
         List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
+        //todo this logic is too complicated
         fileResponses.forEach(FileNameConverter::convertFileName);
         fileResponses.forEach(FileSizeConverter::convertFileSize);
         fileResponses.forEach(CsvFileParser::setFileIconForFile);
         return fileResponses;
+    }
+
+    public List<FileResponse> searchFiles(String filePrefix, Integer userId) {
+        List<Item> userFilesByPrefix = minioRepository.getAllFilesFromUserDirectory(userId);
+        List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(userFilesByPrefix);
+        fileResponses.forEach(FileNameConverter::convertFileName);
+        fileResponses.forEach(FileSizeConverter::convertFileSize);
+        fileResponses.forEach(CsvFileParser::setFileIconForFile);
+        return fileResponses.stream()
+                .filter(f -> f.getObjectName().toLowerCase().contains(filePrefix.toLowerCase()))
+                .toList();
     }
 
     public String removeFile(String filePath, Boolean isDir, Integer userId) {

@@ -28,8 +28,16 @@ public class FacadeMinioRepository extends MinioRepository {
         return super.getObjectsFromPath(path, userId);
     }
 
+    public List<Item> getAllFilesFromUserDirectory(Integer userId) {
+        return minioFileRepository.getAllFilesFromUserDirectory(userId);
+    }
+
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
         super.uploadFile(pathToFile, files, userId);
+    }
+
+    public void uploadEmptyDir(String dirName, String pathToDir, Integer userId) {
+        minioDirRepository.createEmptyDirectory(dirName, pathToDir, userId);
     }
 
     public void removeFile(String filePath, Boolean isDir, Integer userId) {

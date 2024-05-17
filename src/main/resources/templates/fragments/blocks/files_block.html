@@ -15,10 +15,10 @@
         <div th:replace="~{fragments/modals/modal-rename-file :: modal-rename}"></div>
 
         <div th:unless="${file.isDirectory()}">
-            <h3 class="header" th:if="${#strings.length(file.getObjectName()) >= 18}" data-bs-toggle="tooltip"
+            <h3 class="header" th:if="${#strings.length(file.getObjectName()) >= 16}" data-bs-toggle="tooltip"
                 th:title="${file.getObjectName()}"
-                th:text="${#strings.substring(file.getObjectName(), 0, 18) + '...'}"></h3>
-            <h3 class="header" th:if="${#strings.length(file.getObjectName()) < 18}"
+                th:text="${#strings.substring(file.getObjectName(), 0, 16) + '...'}"></h3>
+            <h3 class="header" th:if="${#strings.length(file.getObjectName()) < 16}"
                 th:text="${file.getObjectName()}"></h3>
             <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
             <p th:text="'Size: ' + ${file.getSize()}"></p>

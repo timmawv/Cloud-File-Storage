@@ -1,10 +1,13 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
 import io.minio.*;
+import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Repository
@@ -21,6 +24,26 @@ public class MinioFileRepository extends MinioRepository {
         } catch (Exception e) {
             log.error("Error during deleting file");
         }
+    }
+
+    public List<Item> getAllFilesFromUserDirectory(Integer userId) {
+        String userBaseDirectory = String.format(userDirectory, userId);
+        Iterable<Result<Item>> results = minioClient.listObjects(
+                ListObjectsArgs
+                        .builder()
+                        .bucket(usersBucketName)
+                        .prefix(userBaseDirectory)
+                        .recursive(true)
+                        .build());
+        List<Item> filesInDir = new ArrayList<>();
+        for (Result<Item> item : results) {
+            try {
+                filesInDir.add(item.get());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return filesInDir;
     }
 
     public void copyFileWithNewName(String pathNewFileName, String pathOldFileName, Integer userId) {

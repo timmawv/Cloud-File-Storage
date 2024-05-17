@@ -7,6 +7,11 @@
             </a>
         </div>
 
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" action="/files/search" role="search" method="GET">
+            <input type="search" name="query" class="form-control" placeholder="Search file..." aria-label="Search">
+            <div style="color: red;margin-bottom: -30px" th:if="${error_city_name}" th:text="${error_city_name}"></div>
+        </form>
+
         <div class="col-md-3 text-end" th:if="${login == null}">
             <a href="/login" type="button" class="btn btn-outline-primary me-2">Login</a>
             <a href="/registration" type="button" class="btn btn-primary">Sign-up</a>

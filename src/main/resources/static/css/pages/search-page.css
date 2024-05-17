@@ -1,0 +1,14 @@
+@import url('base.css');
+
+.file_icon {
+    width: 30px;
+    height: 30px;
+}
+
+.header_file_name {
+    display: inline-block;
+}
+
+.path_file {
+    display: inline-block;
+}

@@ -1,6 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
+import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
 import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
@@ -16,9 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -56,13 +55,24 @@ public class FileController {
                 .body(new InputStreamResource(minioService.downloadFile(filePath, personDetails.getUserId())));
     }
 
+    @GetMapping("/search")
+    public String searchFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("query") String filePrefix, Model model) {
+        model.addAttribute("login", personDetails.getUsername());
+        List<FileResponse> files = minioService.searchFiles(filePrefix, personDetails.getUserId());
+        model.addAttribute("files", files);
+        return "pages/search-page";
+    }
+
     @PostMapping
-    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails,
-                                     @RequestPart("file") MultipartFile[] files,
-                                     @RequestParam(name = "path") String pathFromUrl) {
-        CreateFileDto createFileDto = new CreateFileDto(pathFromUrl, files);
+    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails, CreateFileDto createFileDto) {
         minioService.uploadFile(createFileDto, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodePathToFile(pathFromUrl));
+        return "redirect:/files?path=".concat(encodePathToFile(createFileDto.getPath()));
+    }
+
+    @PostMapping("/directory")
+    public String uploadEmptyDirToServer(@AuthenticationPrincipal PersonDetails personDetails, CreateDirRequest createDirRequest) {
+        minioService.uploadEmptyDir(createDirRequest, personDetails.getUserId());
+        return "redirect:/files?path=".concat(encodePathToFile(createDirRequest.getPath()));
     }
 
     @DeleteMapping
