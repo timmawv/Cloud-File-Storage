@@ -37,6 +37,16 @@ public class MinioDirRepository extends MinioRepository {
         removeAllFilesInDirectory(userFilePath);
     }
 
+    public void copyDirWithNewName(String oldFilePath, String newDirPath, Integer userId) {
+        String userFilePath = String.format(userDirectory, userId).concat(oldFilePath);
+        List<Item> filesInDir = getObjectsFromPathForDeletingDirectory(userFilePath);
+        for (Item item : filesInDir) {
+            String fullFilePath = item.objectName();
+            String newFilePath = fullFilePath.replace(oldFilePath, newDirPath);
+            copyFileWithNewName(fullFilePath, newFilePath);
+        }
+    }
+
     private void removeAllFilesInDirectory(String path) {
         List<Item> files = getObjectsFromPathForDeletingDirectory(path);
         List<DeleteObject> objects = new LinkedList<>();
@@ -58,12 +68,13 @@ public class MinioDirRepository extends MinioRepository {
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs
                         .builder()
-                        .bucket("user-files")
+                        .bucket(usersBucketName)
                         .prefix(path)
                         .build());
         List<Item> filesInDir = new ArrayList<>();
         for (Result<Item> item : results) {
             try {
+                //todo change this logic to recursive(true)
                 if (item.get().isDir()) {
                     List<Item> objectsFromPath = getObjectsFromPathForDeletingDirectory(item.get().objectName());
                     filesInDir.addAll(objectsFromPath);
@@ -75,5 +86,22 @@ public class MinioDirRepository extends MinioRepository {
             }
         }
         return filesInDir;
+    }
+
+    private void copyFileWithNewName(String oldPath, String newPath) {
+        try {
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(usersBucketName)
+                            .object(newPath)
+                            .source(
+                                    CopySource.builder()
+                                            .bucket(usersBucketName)
+                                            .object(oldPath)
+                                            .build())
+                            .build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

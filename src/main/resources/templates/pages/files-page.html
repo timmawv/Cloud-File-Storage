@@ -23,7 +23,7 @@
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadFileModal">Upload files to server</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDirModal">Upload directory to server</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDirModal">Create empty directory</button>
-        <nav style="margin-top: 30px" aria-label="breadcrumb">
+        <nav style="margin-top: 30px;--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/files">Base Directory</a></li>
                 <li th:if="${pathList != null}" th:each="path : ${pathList}" class="breadcrumb-item"><a th:with="pathArray=${path.split('/')}" th:text="${pathArray[#lists.size(pathArray) - 1]}" th:href="'files?path=' + ${path}">Path</a></li>

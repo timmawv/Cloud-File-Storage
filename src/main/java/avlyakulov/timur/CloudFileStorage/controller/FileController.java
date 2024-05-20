@@ -9,6 +9,7 @@ import avlyakulov.timur.CloudFileStorage.minio.MinioService;
 import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -49,6 +50,7 @@ public class FileController {
 
     @GetMapping("/upload")
     public ResponseEntity<Object> downloadFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("file") String filePath) {
+        //todo make utf-8 support for filename
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + getFileName(filePath) + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -58,6 +60,7 @@ public class FileController {
     @GetMapping("/search")
     public String searchFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("query") String filePrefix, Model model) {
         model.addAttribute("login", personDetails.getUsername());
+        //todo make validation for file query search, now we can search empty files
         List<FileResponse> files = minioService.searchFiles(filePrefix, personDetails.getUserId());
         model.addAttribute("files", files);
         return "pages/search-page";

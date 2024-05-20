@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<header th:insert="~{fragments/header :: header}"></header>
+<header th:insert="~{fragments/blocks/header :: header}"></header>
 
 <main>
     <div th:if="${success_registration} == null" class="container main">
@@ -48,7 +48,7 @@
     </div>
 </main>
 
-<footer th:insert="~{fragments/footer :: footer}"></footer>
+<footer th:insert="~{fragments/blocks/footer :: footer}"></footer>
 
 </body>
 </html>

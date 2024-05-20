@@ -56,7 +56,7 @@ public class MinioService {
 
     public String removeFile(String filePath, Boolean isDir, Integer userId) {
         minioRepository.removeFile(filePath, isDir, userId);
-        return getPathToObjectsDirectory(filePath, isDir);
+        return getPathToObjectDirectory(filePath, isDir);
     }
 
     public InputStream downloadFile(String filePath, Integer userId) {
@@ -88,14 +88,16 @@ public class MinioService {
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
             removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
             return pathToFile;
+        } else {
+            //todo make return path to new file directory
+            String newPathDir = oldFilePath.replaceFirst("[" + oldFileName + "]+\\/$", newFileName).concat("/");
+            minioRepository.copyDirWithNewName(oldFilePath, newPathDir, userId);
+            minioRepository.removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
+            return newPathDir;
         }
-        //todo make implementation for folder
-        String newFilePath = oldFilePath.replace(oldFileName, newFileName);
-        minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
-        return pathToFile;
     }
 
-    private String getPathToObjectsDirectory(String filePath, Boolean isDir) {
+    private String getPathToObjectDirectory(String filePath, Boolean isDir) {
         //todo make more better we can simplify this logic
         if (isDir) {
             long count = filePath.chars().filter(ch -> ch == '/').count();

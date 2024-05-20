@@ -51,6 +51,10 @@ public class FacadeMinioRepository extends MinioRepository {
         minioFileRepository.copyFileWithNewName(pathNewFile, pathOldFile, userId);
     }
 
+    public void copyDirWithNewName(String oldFilePath, String newPathDir, Integer userId) {
+        minioDirRepository.copyDirWithNewName(oldFilePath, newPathDir, userId);
+    }
+
     public InputStream downloadFile(String filePath, Integer userId) {
         return minioFileRepository.downloadObject(filePath, userId);
     }
