@@ -13,7 +13,7 @@ import java.util.List;
 public interface FileMapper {
 
     @Mapping(target = "filePath", expression = "java(item.objectName())")
-    @Mapping(target = "directory", expression = "java(item.isDir())")
+    @Mapping(target = "isDirectory", expression = "java(item.isDir())")
     FileResponse mapItemToResponse(Item item);
 
     @BeforeMapping

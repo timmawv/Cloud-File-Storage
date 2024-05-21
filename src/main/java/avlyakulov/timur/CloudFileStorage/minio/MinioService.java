@@ -5,9 +5,8 @@ import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
 import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
-import avlyakulov.timur.CloudFileStorage.util.converter.FileNameConverter;
-import avlyakulov.timur.CloudFileStorage.util.converter.FileSizeConverter;
-import avlyakulov.timur.CloudFileStorage.util.csv_parser.CsvFileParser;
+import avlyakulov.timur.CloudFileStorage.util.converter.FileResponseConverter;
+import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -35,28 +35,23 @@ public class MinioService {
 
     public List<FileResponse> getUserFiles(String path, Integer userId) {
         List<Item> objectsFromStorage = minioRepository.getAllFilesFromPath(path, userId);
-        List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
-        //todo this logic is too complicated
-        fileResponses.forEach(FileNameConverter::convertFileName);
-        fileResponses.forEach(FileSizeConverter::convertFileSize);
-        fileResponses.forEach(CsvFileParser::setFileIconForFile);
-        return fileResponses;
+        List<FileResponse> filesResponse = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
+        FileResponseConverter.convertFieldsFileResponse(filesResponse);
+        return filesResponse;
     }
 
     public List<FileResponse> searchFiles(String filePrefix, Integer userId) {
         List<Item> userFilesByPrefix = minioRepository.getAllFilesFromUserDirectory(userId);
-        List<FileResponse> fileResponses = fileMapper.mapListItemsFromStorageToListFileResponse(userFilesByPrefix);
-        fileResponses.forEach(FileNameConverter::convertFileName);
-        fileResponses.forEach(FileSizeConverter::convertFileSize);
-        fileResponses.forEach(CsvFileParser::setFileIconForFile);
-        return fileResponses.stream()
+        List<FileResponse> filesResponse = fileMapper.mapListItemsFromStorageToListFileResponse(userFilesByPrefix);
+        FileResponseConverter.convertFieldsFileResponse(filesResponse);
+        return filesResponse.stream()
                 .filter(f -> f.getObjectName().toLowerCase().contains(filePrefix.toLowerCase()))
                 .toList();
     }
 
     public String removeFile(String filePath, Boolean isDir, Integer userId) {
         minioRepository.removeFile(filePath, isDir, userId);
-        return getPathToObjectDirectory(filePath, isDir);
+        return StringFileUtils.getPathToObjectDirectory(filePath, isDir);
     }
 
     public InputStream downloadFile(String filePath, Integer userId) {
@@ -64,51 +59,25 @@ public class MinioService {
     }
 
     public String updateFileName(UpdateFileNameDto updateFileNameDto, Integer userId) {
+        String oldFileName = updateFileNameDto.getOldFileName();
         String oldFilePath = updateFileNameDto.getOldFilePath();
         String newFileName = updateFileNameDto.getNewFileName();
-        String oldFileName = updateFileNameDto.getOldFileName();
-        String pathToFile = "";
 
-        if (oldFilePath.contains("/")) {
-            int lastIndexOfSlash = oldFilePath.lastIndexOf("/");
-            pathToFile = oldFilePath.substring(0, lastIndexOfSlash + 1);
-        }
+        String pathToFile = StringFileUtils.getPathToObjectDirectory(oldFilePath, updateFileNameDto.getIsFileDirectory());
 
         if (!updateFileNameDto.getIsFileDirectory()) {
-            String newFilePath = "";
-            if (oldFileName.contains(".")) {
-                int indexOfDot = oldFileName.lastIndexOf(".");
-                newFilePath = pathToFile.concat(newFileName).concat(oldFileName.substring(indexOfDot));
-            } else {
-                newFilePath = pathToFile.concat(newFileName);
-            }
+            String newFilePath = pathToFile.concat(newFileName).concat(StringFileUtils.getFileType(oldFileName));
             if (newFilePath.equals(oldFilePath)) {
                 return pathToFile;
             }
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
             removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
-            return pathToFile;
         } else {
-            //todo make return path to new file directory
-            String newPathDir = oldFilePath.replaceFirst("[" + oldFileName + "]+\\/$", newFileName).concat("/");
+            String escapedFileName = Pattern.quote(oldFileName);
+            String newPathDir = oldFilePath.replaceFirst("[" + escapedFileName + "]+\\/$", newFileName).concat("/");
             minioRepository.copyDirWithNewName(oldFilePath, newPathDir, userId);
             minioRepository.removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
-            return newPathDir;
         }
-    }
-
-    private String getPathToObjectDirectory(String filePath, Boolean isDir) {
-        //todo make more better we can simplify this logic
-        if (isDir) {
-            long count = filePath.chars().filter(ch -> ch == '/').count();
-            if (count == 1)
-                return "";
-            return filePath.replaceAll("/[^/]+/$", "/");
-        }
-        if (filePath.contains("/")) {
-            int lastIndexOfSlash = filePath.lastIndexOf("/");
-            return filePath.substring(0, lastIndexOfSlash + 1);
-        }
-        return "";
+        return pathToFile;
     }
 }

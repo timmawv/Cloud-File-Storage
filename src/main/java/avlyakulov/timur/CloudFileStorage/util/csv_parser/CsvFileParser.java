@@ -1,6 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.util.csv_parser;
 
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +37,11 @@ public class CsvFileParser {
     }
 
     public static void setFileIconForFile(FileResponse fileResponse) {
-        int lastIndexFormat = fileResponse.getFilePath().lastIndexOf(".");
-        String fileFormat = fileResponse.getFilePath().substring(lastIndexFormat + 1).toLowerCase();
-        if (!fileResponse.isDirectory()) {
+        if (!fileResponse.getIsDirectory()) {
+            String fileFormat = StringFileUtils.getFileType(fileResponse.getObjectName());
             fileResponse.setFileIcon(fileFormats.getOrDefault(fileFormat, defaultUrlFile));
             return;
         }
-        fileResponse.setFileIcon(fileFormats.getOrDefault("directory", defaultUrlFile));
+        fileResponse.setFileIcon(fileFormats.getOrDefault(".dir", defaultUrlFile));
     }
 }

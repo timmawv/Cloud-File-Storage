@@ -10,7 +10,7 @@
                 <form th:method="PATCH" name="renameFileForm" th:action="@{/files}" onsubmit="return prepareForm(this)">
                     <label><input type="text" id="file" name="newFileName" required></label>
                     <input type="hidden" name="oldFilePath" th:value="${file.getFilePath()}">
-                    <input type="hidden" name="isFileDirectory" th:value="${file.isDirectory()}">
+                    <input type="hidden" name="isFileDirectory" th:value="${file.getIsDirectory()}">
                     <input type="hidden" name="oldFileName" th:value="${file.getObjectName()}">
                     <button type="submit" class="btn btn-primary">Rename File</button>
                     <p id="errorFileName" style="color: red;"></p>

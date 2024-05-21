@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class UpdateFileNameDto {
 
-    private String newFileName;
+    private String oldFileName;
 
     private String oldFilePath;
 
-    private String oldFileName;
+    private String newFileName;
 
     private Boolean isFileDirectory;
 }

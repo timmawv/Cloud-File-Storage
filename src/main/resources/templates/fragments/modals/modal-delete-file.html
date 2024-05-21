@@ -11,7 +11,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                 <form th:method="DELETE" th:action="@{/files}">
                     <input name="file" type="hidden" th:value="${file.getFilePath()}">
-                    <input name="isDir" type="hidden" th:value="${file.isDirectory()}">
+                    <input name="isDir" type="hidden" th:value="${file.getIsDirectory()}">
                     <button type="submit" class="btn btn-danger">Yes</button>
                 </form>
             </div>

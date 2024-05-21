@@ -31,15 +31,19 @@ public class MinioRepository {
                         .bucket(usersBucketName)
                         .prefix(userDirectoryFormatted)
                         .build());
-        List<Item> filesInDir = new ArrayList<>();
-        for (Result<Item> item : results) {
-            try {
-                filesInDir.add(item.get());
-            } catch (Exception e) {
-                log.error("Error during adding file to list in minio util");
-            }
-        }
-        return filesInDir;
+        return getItemsFromResult(results);
+    }
+
+    public List<Item> getObjectsRecursiveFromPath(String path, Integer userId) {
+        String userDirectoryFormatted = String.format(userDirectory, userId).concat(path);
+        Iterable<Result<Item>> results = minioClient.listObjects(
+                ListObjectsArgs
+                        .builder()
+                        .bucket(usersBucketName)
+                        .prefix(userDirectoryFormatted)
+                        .recursive(true)
+                        .build());
+        return getItemsFromResult(results);
     }
 
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
@@ -61,6 +65,18 @@ public class MinioRepository {
         } catch (Exception e) {
             log.error("something went wrong with minio while was creating user directory");
         }
+    }
+
+    public List<Item> getItemsFromResult(Iterable<Result<Item>> results) {
+        List<Item> filesInDir = new ArrayList<>();
+        for (Result<Item> item : results) {
+            try {
+                filesInDir.add(item.get());
+            } catch (Exception e) {
+                log.error("Error during adding file to list in minio util");
+            }
+        }
+        return filesInDir;
     }
 
     private void baseMinioConfiguration() {

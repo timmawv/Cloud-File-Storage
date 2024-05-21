@@ -5,7 +5,7 @@
             <button class="btn btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Action with file</button>
             <ul class="dropdown-menu">
                 <li data-bs-toggle="modal" th:data-bs-target="'#renameFileModal' + ${iterStat.index + 1}"><a class="dropdown-item">Rename file</a></li>
-                <li th:unless="${file.isDirectory()}"><a class="dropdown-item" th:href="'/files/upload?file=' + ${file.getFilePath()}">Download file</a></li>
+                <li th:unless="${file.getIsDirectory()}"><a class="dropdown-item" th:href="'/files/upload?file=' + ${file.getFilePath()}">Download file</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li data-bs-toggle="modal" th:data-bs-target="'#deleteFileModal' + ${iterStat.index + 1}"><a class="dropdown-item">Delete file</a></li>
             </ul>
@@ -14,7 +14,7 @@
         <div th:replace="~{fragments/modals/modal-delete-file :: modal-delete}"></div>
         <div th:replace="~{fragments/modals/modal-rename-file :: modal-rename}"></div>
 
-        <div th:unless="${file.isDirectory()}">
+        <div th:unless="${file.getIsDirectory()}">
             <h3 class="header" th:if="${#strings.length(file.getObjectName()) >= 16}" data-bs-toggle="tooltip"
                 th:title="${file.getObjectName()}"
                 th:text="${#strings.substring(file.getObjectName(), 0, 16) + '...'}"></h3>
@@ -25,7 +25,7 @@
             <p th:text="'Last modified: ' + ${file.getLastModified()}"></p>
         </div>
 
-        <div th:if="${file.isDirectory()}">
+        <div th:if="${file.getIsDirectory()}">
             <h3 class="header"><a th:href="'files?path=' + ${file.getFilePath()}" th:text="${file.getObjectName()}"></a></h3>
             <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
         </div>

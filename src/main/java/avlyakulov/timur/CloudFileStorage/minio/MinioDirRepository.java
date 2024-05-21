@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,14 +31,8 @@ public class MinioDirRepository extends MinioRepository {
         }
     }
 
-    public void removeDirectory(String filePath, Integer userId) {
-        String userFilePath = String.format(userDirectory, userId).concat(filePath);
-        removeAllFilesInDirectory(userFilePath);
-    }
-
     public void copyDirWithNewName(String oldFilePath, String newDirPath, Integer userId) {
-        String userFilePath = String.format(userDirectory, userId).concat(oldFilePath);
-        List<Item> filesInDir = getObjectsFromPathForDeletingDirectory(userFilePath);
+        List<Item> filesInDir = getObjectsRecursiveFromPath(oldFilePath, userId);
         for (Item item : filesInDir) {
             String fullFilePath = item.objectName();
             String newFilePath = fullFilePath.replace(oldFilePath, newDirPath);
@@ -47,8 +40,9 @@ public class MinioDirRepository extends MinioRepository {
         }
     }
 
-    private void removeAllFilesInDirectory(String path) {
-        List<Item> files = getObjectsFromPathForDeletingDirectory(path);
+    //removing all files in dir to delete
+    public void removeDirectory(String filePath, Integer userId) {
+        List<Item> files = getObjectsRecursiveFromPath(filePath, userId);
         List<DeleteObject> objects = new LinkedList<>();
         files.forEach(f -> objects.add(new DeleteObject(f.objectName())));
         Iterable<Result<DeleteError>> results =
@@ -62,30 +56,6 @@ public class MinioDirRepository extends MinioRepository {
                 e.printStackTrace();
             }
         }
-    }
-
-    private List<Item> getObjectsFromPathForDeletingDirectory(String path) {
-        Iterable<Result<Item>> results = minioClient.listObjects(
-                ListObjectsArgs
-                        .builder()
-                        .bucket(usersBucketName)
-                        .prefix(path)
-                        .build());
-        List<Item> filesInDir = new ArrayList<>();
-        for (Result<Item> item : results) {
-            try {
-                //todo change this logic to recursive(true)
-                if (item.get().isDir()) {
-                    List<Item> objectsFromPath = getObjectsFromPathForDeletingDirectory(item.get().objectName());
-                    filesInDir.addAll(objectsFromPath);
-                } else {
-                    filesInDir.add(item.get());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return filesInDir;
     }
 
     private void copyFileWithNewName(String oldPath, String newPath) {

@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -27,37 +26,21 @@ public class MinioFileRepository extends MinioRepository {
     }
 
     public List<Item> getAllFilesFromUserDirectory(Integer userId) {
-        String userBaseDirectory = String.format(userDirectory, userId);
-        Iterable<Result<Item>> results = minioClient.listObjects(
-                ListObjectsArgs
-                        .builder()
-                        .bucket(usersBucketName)
-                        .prefix(userBaseDirectory)
-                        .recursive(true)
-                        .build());
-        List<Item> filesInDir = new ArrayList<>();
-        for (Result<Item> item : results) {
-            try {
-                filesInDir.add(item.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return filesInDir;
+        return getObjectsRecursiveFromPath("", userId);
     }
 
-    public void copyFileWithNewName(String pathNewFileName, String pathOldFileName, Integer userId) {
-        String updateFileName = String.format(userDirectory, userId).concat(pathNewFileName);
-        String oldFileName = String.format(userDirectory, userId).concat(pathOldFileName);
+    public void copyFileWithNewName(String newFilePath, String oldFilePath, Integer userId) {
+        String newFilePathName = String.format(userDirectory, userId).concat(newFilePath);
+        String oldFilePathName = String.format(userDirectory, userId).concat(oldFilePath);
         try {
             minioClient.copyObject(
                     CopyObjectArgs.builder()
                             .bucket(usersBucketName)
-                            .object(updateFileName)
+                            .object(newFilePathName)
                             .source(
                                     CopySource.builder()
                                             .bucket(usersBucketName)
-                                            .object(oldFileName)
+                                            .object(oldFilePathName)
                                             .build())
                             .build());
         } catch (Exception e) {

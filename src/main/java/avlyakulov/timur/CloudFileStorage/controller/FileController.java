@@ -9,7 +9,6 @@ import avlyakulov.timur.CloudFileStorage.minio.MinioService;
 import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -50,9 +49,8 @@ public class FileController {
 
     @GetMapping("/upload")
     public ResponseEntity<Object> downloadFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("file") String filePath) {
-        //todo make utf-8 support for filename
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + getFileName(filePath) + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodeStringUtf8(getFileName(filePath)) + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(new InputStreamResource(minioService.downloadFile(filePath, personDetails.getUserId())));
     }
@@ -69,29 +67,29 @@ public class FileController {
     @PostMapping
     public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails, CreateFileDto createFileDto) {
         minioService.uploadFile(createFileDto, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodePathToFile(createFileDto.getPath()));
+        return "redirect:/files?path=".concat(encodeStringUtf8(createFileDto.getPath()));
     }
 
     @PostMapping("/directory")
     public String uploadEmptyDirToServer(@AuthenticationPrincipal PersonDetails personDetails, CreateDirRequest createDirRequest) {
         minioService.uploadEmptyDir(createDirRequest, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodePathToFile(createDirRequest.getPath()));
+        return "redirect:/files?path=".concat(encodeStringUtf8(createDirRequest.getPath()));
     }
 
     @DeleteMapping
     public String deleteFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("isDir") Boolean isDir, @RequestParam("file") String filePath) {
         String pathToFileDirectory = minioService.removeFile(filePath, isDir, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodePathToFile(pathToFileDirectory));
+        return "redirect:/files?path=".concat(encodeStringUtf8(pathToFileDirectory));
     }
 
     @PatchMapping
     public String updateFileName(@AuthenticationPrincipal PersonDetails personDetails, @ModelAttribute("renameFileForm") UpdateFileNameDto updateFileNameDto) {
         String pathToFile = minioService.updateFileName(updateFileNameDto, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodePathToFile(pathToFile));
+        return "redirect:/files?path=".concat(encodeStringUtf8(pathToFile));
     }
 
-    private String encodePathToFile(String filePath) {
-        return URLEncoder.encode(filePath, StandardCharsets.UTF_8);
+    private String encodeStringUtf8(String string) {
+        return URLEncoder.encode(string, StandardCharsets.UTF_8);
     }
 
     private String getFileName(String filePath) {
