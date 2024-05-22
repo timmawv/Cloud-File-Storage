@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +24,8 @@ public class User implements Serializable {
     private String login;
 
     private String password;
+
+    private BigInteger capacity;
 
     public User(String login, String password) {
         this.login = login;

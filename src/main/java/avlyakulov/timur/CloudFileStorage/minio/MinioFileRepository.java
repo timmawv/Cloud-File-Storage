@@ -1,11 +1,13 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
+import avlyakulov.timur.CloudFileStorage.util.CountFilesSize;
 import io.minio.*;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.List;
 
 @Slf4j
@@ -16,13 +18,16 @@ public class MinioFileRepository extends MinioRepository {
         super(minioClient);
     }
 
-    public void removeFile(String filePath, Integer userId) {
+    public BigInteger removeFile(String filePath, Integer userId) {
         String userFilePath = String.format(userDirectory, userId).concat(filePath);
+        List<Item> files = getObjectsFromPath(filePath, userId);
+        BigInteger sizeOfFile = CountFilesSize.countItemSize(files.stream());
         try {
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
         } catch (Exception e) {
             log.error("Error during deleting file");
         }
+        return sizeOfFile;
     }
 
     public List<Item> getAllFilesFromUserDirectory(Integer userId) {

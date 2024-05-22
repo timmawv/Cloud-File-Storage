@@ -18,7 +18,6 @@ public class FacadeMinioRepository {
 
     private final MinioDirRepository minioDirRepository;
 
-
     public List<Item> getAllFilesFromPath(String path, Integer userId) {
         return minioRepository.getObjectsFromPath(path, userId);
     }
@@ -28,7 +27,7 @@ public class FacadeMinioRepository {
     }
 
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
-         minioRepository.uploadFile(pathToFile, files, userId);
+        minioRepository.uploadFile(pathToFile, files, userId);
     }
 
     public void uploadEmptyDir(String dirName, String pathToDir, Integer userId) {

@@ -34,7 +34,9 @@ public class FileController {
     @GetMapping
     public String getFilesPage(@AuthenticationPrincipal PersonDetails personDetails,
                                @RequestParam(name = "path", required = false) Optional<String> path, Model model) {
+        //todo change logic of auth principal it can't know about the capacity
         model.addAttribute("login", personDetails.getUsername());
+        model.addAttribute("capacity", minioService.getUserCapacity(personDetails.getUserId()));
         String pathFromUrl = path.orElse("");
         List<FileResponse> files = minioService.getUserFiles(pathFromUrl, personDetails.getUserId());
         model.addAttribute("files", files);

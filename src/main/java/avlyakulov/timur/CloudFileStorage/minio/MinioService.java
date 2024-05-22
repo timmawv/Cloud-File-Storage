@@ -5,7 +5,10 @@ import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
 import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
+import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
+import avlyakulov.timur.CloudFileStorage.util.CountFilesSize;
 import avlyakulov.timur.CloudFileStorage.util.converter.FileResponseConverter;
+import avlyakulov.timur.CloudFileStorage.util.converter.FileSizeConverter;
 import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -23,10 +29,19 @@ public class MinioService {
 
     private final FacadeMinioRepository minioRepository;
 
+    private final UserRepository userRepository;
+
     private final FileMapper fileMapper;
 
     public void uploadFile(CreateFileDto createFileDto, Integer userId) {
+        //todo i have error if file wasn't uploaded it also add size of file
         minioRepository.uploadFile(createFileDto.getPath(), createFileDto.getFiles(), userId);
+        BigInteger sizeOfFiles = CountFilesSize.countFileSize(Arrays.stream(createFileDto.getFiles()));
+        userRepository.increaseUserCapacity(sizeOfFiles, userId);
+    }
+
+    public BigDecimal getUserCapacity(Integer userId) {
+        return FileSizeConverter.convertBytesToMB(userRepository.findUserCapacity(userId).orElse(BigInteger.ZERO));
     }
 
     public void uploadEmptyDir(CreateDirRequest createDirRequest, Integer userId) {
@@ -50,7 +65,11 @@ public class MinioService {
     }
 
     public String removeFile(String filePath, Boolean isDir, Integer userId) {
+        //todo something bad with dir deleting
+        List<Item> files = minioRepository.getAllFilesFromPath(filePath, userId);
         minioRepository.removeFile(filePath, isDir, userId);
+        BigInteger sizeOfFile = CountFilesSize.countItemSize(files.stream());
+        userRepository.decreaseUserCapacity(sizeOfFile, userId);
         return StringFileUtils.getPathToObjectDirectory(filePath, isDir);
     }
 
@@ -71,7 +90,7 @@ public class MinioService {
                 return pathToFile;
             }
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
-            removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
+            minioRepository.removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
         } else {
             String escapedFileName = Pattern.quote(oldFileName);
             String newPathDir = oldFilePath.replaceFirst("[" + escapedFileName + "]+\\/$", newFileName).concat("/");

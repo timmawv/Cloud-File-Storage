@@ -5,6 +5,7 @@ import avlyakulov.timur.CloudFileStorage.dto.UserDto;
 import avlyakulov.timur.CloudFileStorage.mapper.UserMapper;
 import avlyakulov.timur.CloudFileStorage.model.User;
 import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,24 +13,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void saveUser(UserDto userDto) {
@@ -40,5 +36,15 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new UserLoginAlreadyExistException("User with such login already exists");
         }
+    }
+
+    @Transactional
+    public void increaseUserCapacity(BigInteger capacity, Integer userId) {
+        userRepository.increaseUserCapacity(capacity, userId);
+    }
+
+    @Transactional
+    public void decreaseUserCapacity(BigInteger capacity, Integer userId) {
+        userRepository.decreaseUserCapacity(capacity, userId);
     }
 }

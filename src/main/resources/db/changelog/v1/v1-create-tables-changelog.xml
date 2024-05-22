@@ -35,4 +35,17 @@ https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
         <loadData tableName="users" file="db/data/users-data.csv"/>
     </changeSet>
 
+    <changeSet id="v1-3" author="Timur">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="capacity"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="users">
+            <column name="capacity" type="bigint"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

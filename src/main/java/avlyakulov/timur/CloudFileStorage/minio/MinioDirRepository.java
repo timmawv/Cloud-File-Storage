@@ -1,5 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
+import avlyakulov.timur.CloudFileStorage.util.CountFilesSize;
 import io.minio.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,8 +43,9 @@ public class MinioDirRepository extends MinioRepository {
     }
 
     //removing all files in dir to delete
-    public void removeDirectory(String filePath, Integer userId) {
+    public BigInteger removeDirectory(String filePath, Integer userId) {
         List<Item> files = getObjectsRecursiveFromPath(filePath, userId);
+        BigInteger dirSize = CountFilesSize.countItemSize(files.stream());
         List<DeleteObject> objects = new LinkedList<>();
         files.forEach(f -> objects.add(new DeleteObject(f.objectName())));
         Iterable<Result<DeleteError>> results =
@@ -56,6 +59,7 @@ public class MinioDirRepository extends MinioRepository {
                 e.printStackTrace();
             }
         }
+        return dirSize;
     }
 
     private void copyFileWithNewName(String oldPath, String newPath) {
