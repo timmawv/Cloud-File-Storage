@@ -7,6 +7,7 @@ import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
 import avlyakulov.timur.CloudFileStorage.minio.MinioService;
 import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverter;
+import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -37,7 +38,7 @@ public class FileController {
         //todo change logic of auth principal it can't know about the capacity
         model.addAttribute("login", personDetails.getUsername());
         model.addAttribute("capacity", minioService.getUserCapacity(personDetails.getUserId()));
-        String pathFromUrl = path.orElse("");
+        String pathFromUrl = path.orElse(StringFileUtils.EMPTY_STRING);
         List<FileResponse> files = minioService.getUserFiles(pathFromUrl, personDetails.getUserId());
         model.addAttribute("files", files);
         model.addAttribute("path", pathFromUrl);

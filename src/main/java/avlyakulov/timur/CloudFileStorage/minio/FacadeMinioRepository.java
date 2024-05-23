@@ -18,12 +18,16 @@ public class FacadeMinioRepository {
 
     private final MinioDirRepository minioDirRepository;
 
-    public List<Item> getAllFilesFromPath(String path, Integer userId) {
+    public List<Item> getFilesFromPath(String path, Integer userId) {
         return minioRepository.getObjectsFromPath(path, userId);
     }
 
-    public List<Item> getAllFilesFromUserDirectory(Integer userId) {
-        return minioFileRepository.getAllFilesFromUserDirectory(userId);
+    public List<Item> getFilesRecursiveFromPath(String path, Integer userId) {
+        return minioRepository.getObjectsRecursiveFromPath(path, userId);
+    }
+
+    public List<Item> getFilesRecursiveFromUserDirectory(Integer userId) {
+        return minioFileRepository.getFilesRecursiveFromUserDirectory(userId);
     }
 
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {

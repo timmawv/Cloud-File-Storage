@@ -34,9 +34,8 @@ public class MinioService {
     private final FileMapper fileMapper;
 
     public void uploadFile(CreateFileDto createFileDto, Integer userId) {
-        //todo i have error if file wasn't uploaded it also add size of file
         minioRepository.uploadFile(createFileDto.getPath(), createFileDto.getFiles(), userId);
-        BigInteger sizeOfFiles = CountFilesSize.countFileSize(Arrays.stream(createFileDto.getFiles()));
+        BigInteger sizeOfFiles = CountFilesSize.countFileSize(Arrays.asList(createFileDto.getFiles()));
         userRepository.increaseUserCapacity(sizeOfFiles, userId);
     }
 
@@ -49,14 +48,14 @@ public class MinioService {
     }
 
     public List<FileResponse> getUserFiles(String path, Integer userId) {
-        List<Item> objectsFromStorage = minioRepository.getAllFilesFromPath(path, userId);
+        List<Item> objectsFromStorage = minioRepository.getFilesFromPath(path, userId);
         List<FileResponse> filesResponse = fileMapper.mapListItemsFromStorageToListFileResponse(objectsFromStorage);
         FileResponseConverter.convertFieldsFileResponse(filesResponse);
         return filesResponse;
     }
 
     public List<FileResponse> searchFiles(String filePrefix, Integer userId) {
-        List<Item> userFilesByPrefix = minioRepository.getAllFilesFromUserDirectory(userId);
+        List<Item> userFilesByPrefix = minioRepository.getFilesRecursiveFromUserDirectory(userId);
         List<FileResponse> filesResponse = fileMapper.mapListItemsFromStorageToListFileResponse(userFilesByPrefix);
         FileResponseConverter.convertFieldsFileResponse(filesResponse);
         return filesResponse.stream()
@@ -66,9 +65,9 @@ public class MinioService {
 
     public String removeFile(String filePath, Boolean isDir, Integer userId) {
         //todo something bad with dir deleting
-        List<Item> files = minioRepository.getAllFilesFromPath(filePath, userId);
+        List<Item> files = minioRepository.getFilesRecursiveFromPath(filePath, userId);
         minioRepository.removeFile(filePath, isDir, userId);
-        BigInteger sizeOfFile = CountFilesSize.countItemSize(files.stream());
+        BigInteger sizeOfFile = CountFilesSize.countItemSize(files);
         userRepository.decreaseUserCapacity(sizeOfFile, userId);
         return StringFileUtils.getPathToObjectDirectory(filePath, isDir);
     }

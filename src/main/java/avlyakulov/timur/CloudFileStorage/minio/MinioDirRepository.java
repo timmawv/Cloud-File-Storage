@@ -45,7 +45,7 @@ public class MinioDirRepository extends MinioRepository {
     //removing all files in dir to delete
     public BigInteger removeDirectory(String filePath, Integer userId) {
         List<Item> files = getObjectsRecursiveFromPath(filePath, userId);
-        BigInteger dirSize = CountFilesSize.countItemSize(files.stream());
+        BigInteger dirSize = CountFilesSize.countItemSize(files);
         List<DeleteObject> objects = new LinkedList<>();
         files.forEach(f -> objects.add(new DeleteObject(f.objectName())));
         Iterable<Result<DeleteError>> results =

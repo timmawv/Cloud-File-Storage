@@ -2,7 +2,7 @@ package avlyakulov.timur.CloudFileStorage.util.strings;
 
 public class StringFileUtils {
 
-    private static final String EMPTY_STRING = "";
+    public static final String EMPTY_STRING = "";
 
     public static String getPathToObjectDirectory(String filePath, Boolean isDir) {
         if (isDir) {
