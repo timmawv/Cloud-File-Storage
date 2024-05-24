@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.service;
 
-import avlyakulov.timur.CloudFileStorage.IntegrationTestBase;
+import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
 import avlyakulov.timur.CloudFileStorage.custom_exceptions.UserLoginAlreadyExistException;
 import avlyakulov.timur.CloudFileStorage.dto.UserDto;
 import avlyakulov.timur.CloudFileStorage.model.User;
@@ -14,7 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class UserServiceTest extends IntegrationTestBase {
+class UserServiceTest extends UserIntegrationTestBase {
 
     @Autowired
     private UserService userService;
@@ -28,7 +28,6 @@ class UserServiceTest extends IntegrationTestBase {
     void tearUsers() {
         userRepository.deleteAll();
     }
-
 
     @Test
     public void saveUser_userWasSaved_validUser() {

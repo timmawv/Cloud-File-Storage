@@ -37,14 +37,4 @@ public class UserService {
             throw new UserLoginAlreadyExistException("User with such login already exists");
         }
     }
-
-    @Transactional
-    public void increaseUserCapacity(BigInteger capacity, Integer userId) {
-        userRepository.increaseUserCapacity(capacity, userId);
-    }
-
-    @Transactional
-    public void decreaseUserCapacity(BigInteger capacity, Integer userId) {
-        userRepository.decreaseUserCapacity(capacity, userId);
-    }
 }

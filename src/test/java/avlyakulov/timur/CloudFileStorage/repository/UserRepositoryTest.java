@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.repository;
 
-import avlyakulov.timur.CloudFileStorage.IntegrationTestBase;
+import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
 import avlyakulov.timur.CloudFileStorage.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UserRepositoryTest extends IntegrationTestBase {
+class UserRepositoryTest extends UserIntegrationTestBase {
 
     private User user = new User("timur", "123");
 

@@ -35,3 +35,7 @@ spring:
 server:
   tomcat:
     max-swallow-size: -1
+minio:
+  host: ${MINIO_HOST}
+  login: ${MINIO_LOGIN}
+  password: ${MINIO_PASSWORD}
