@@ -21,7 +21,7 @@ public class MinioDirRepository extends MinioRepository {
     }
 
     public void createEmptyDirectory(String dirName, String pathToDir, Integer userId) {
-        String userDirectoryPath = String.format(userDirectory, userId).concat(pathToDir).concat(dirName.concat("/"));
+        String userDirectoryPath = String.format(userDirectory, userId, pathToDir.concat(dirName.concat("/")));
         try {
             minioClient.putObject(
                     PutObjectArgs.builder().bucket(usersBucketName).object(userDirectoryPath)

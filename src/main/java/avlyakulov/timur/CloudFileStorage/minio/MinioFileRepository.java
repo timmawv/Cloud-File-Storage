@@ -19,7 +19,7 @@ public class MinioFileRepository extends MinioRepository {
     }
 
     public void removeFile(String filePath, Integer userId) {
-        String userFilePath = String.format(userDirectory, userId).concat(filePath);
+        String userFilePath = String.format(userDirectory, userId, filePath);
         try {
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
         } catch (Exception e) {
@@ -33,8 +33,8 @@ public class MinioFileRepository extends MinioRepository {
     }
 
     public void copyFileWithNewName(String newFilePath, String oldFilePath, Integer userId) {
-        String newFilePathName = String.format(userDirectory, userId).concat(newFilePath);
-        String oldFilePathName = String.format(userDirectory, userId).concat(oldFilePath);
+        String newFilePathName = String.format(userDirectory, userId, newFilePath);
+        String oldFilePathName = String.format(userDirectory, userId, oldFilePath);
         try {
             minioClient.copyObject(
                     CopyObjectArgs.builder()
@@ -53,7 +53,7 @@ public class MinioFileRepository extends MinioRepository {
     }
 
     public InputStream downloadObject(String filePath, Integer userId) {
-        String userFilePath = String.format(userDirectory, userId).concat(filePath);
+        String userFilePath = String.format(userDirectory, userId, filePath);
         try {
             return minioClient.getObject(
                     GetObjectArgs.builder()

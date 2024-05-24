@@ -13,7 +13,6 @@ import org.thymeleaf.Thymeleaf;
 public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        //todo make styles/css and js
         registry
                 .addResourceHandler("/static/css/**")
                 .addResourceLocations("classpath:/static/css/");

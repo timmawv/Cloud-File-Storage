@@ -19,12 +19,12 @@ import java.util.List;
 public class MinioRepository {
 
     protected final MinioClient minioClient;
-    protected final String userDirectory = "user-%d-files/";
+    protected final String userDirectory = "user-%d-files/%s";
     protected final String usersBucketName = "user-files";
 
     public List<Item> getObjectsFromPath(String path, Integer userId) {
         baseMinioConfiguration();
-        String userDirectoryFormatted = String.format(userDirectory, userId).concat(path);
+        String userDirectoryFormatted = String.format(userDirectory, userId, path);
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs
                         .builder()
@@ -34,9 +34,8 @@ public class MinioRepository {
         return getItemsFromResult(results);
     }
 
-    //todo make one method to find path recursive
     public List<Item> getObjectsRecursiveFromPath(String path, Integer userId) {
-        String userDirectoryFormatted = String.format(userDirectory, userId).concat(path);
+        String userDirectoryFormatted = String.format(userDirectory, userId, path);
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs
                         .builder()
@@ -49,7 +48,7 @@ public class MinioRepository {
 
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
         for (MultipartFile file : files) {
-            String userDirectoryFormatted = String.format(userDirectory, userId).concat(pathToFile.concat(file.getOriginalFilename()));
+            String userDirectoryFormatted = String.format(userDirectory, userId, pathToFile.concat(file.getOriginalFilename()));
             createFile(file, userDirectoryFormatted);
         }
     }
