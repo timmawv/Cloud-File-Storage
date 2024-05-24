@@ -16,7 +16,7 @@
 
 <main>
     <div class="container main">
-        <h3>Upload file to server</h3>
+        <h2>Upload file to server</h2>
         <p style="color: red" th:if="${fileUploadError}" th:text="${fileUploadError}">Upload error</p>
         <div th:replace="~{fragments/modals/modal-upload-file :: modal-upload-file}"></div>
         <div th:replace="~{fragments/modals/modal-upload-dir :: modal-upload-dir}"></div>
@@ -24,9 +24,9 @@
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadFileModal">Upload files to server</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDirModal">Upload directory to server</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDirModal">Create empty directory</button>
-        <h2 th:text= "${capacity} + ' MB of 1 GB used'"></h2>
+        <h2 style="margin-top: 10px" th:text="${capacity} + ' MB of 1 GB used'"></h2>
         <div class="progress" style="width: 40%">
-            <div class="progress-bar" th:text="${capacity / 10} + '%'"  role="progressbar" th:style="'width:'  + ${capacity / 10} + '%;'" th:aria-valuenow="${capacity / 10}" aria-valuemin="0" aria-valuemax="1000"></div>
+            <div class="progress-bar progress-bar-striped active"  role="progressbar" th:style="'width:'  + ${capacity / 10} + '%;'" th:aria-valuenow="${capacity / 10}" aria-valuemin="0" aria-valuemax="1000"></div>
         </div>
         <nav style="margin-top: 30px;--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
             <ol class="breadcrumb">

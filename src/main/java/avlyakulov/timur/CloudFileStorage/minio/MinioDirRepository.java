@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.util.CountFilesSize;
+import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
 import io.minio.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +29,7 @@ public class MinioDirRepository extends MinioRepository {
                             .build());
         } catch (Exception e) {
             log.error("Error during creating empty directory");
+            throw new MinioGlobalFileException("Error during creating empty dir on the server");
         }
     }
 
@@ -43,9 +43,8 @@ public class MinioDirRepository extends MinioRepository {
     }
 
     //removing all files in dir to delete
-    public BigInteger removeDirectory(String filePath, Integer userId) {
+    public void removeDirectory(String filePath, Integer userId) {
         List<Item> files = getObjectsRecursiveFromPath(filePath, userId);
-        BigInteger dirSize = CountFilesSize.countItemSize(files);
         List<DeleteObject> objects = new LinkedList<>();
         files.forEach(f -> objects.add(new DeleteObject(f.objectName())));
         Iterable<Result<DeleteError>> results =
@@ -57,9 +56,9 @@ public class MinioDirRepository extends MinioRepository {
                 System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new MinioGlobalFileException("Error during removing directory");
             }
         }
-        return dirSize;
     }
 
     private void copyFileWithNewName(String oldPath, String newPath) {
@@ -76,6 +75,7 @@ public class MinioDirRepository extends MinioRepository {
                             .build());
         } catch (Exception e) {
             e.printStackTrace();
+            throw new MinioGlobalFileException("Error during copying file with new name");
         }
     }
 }

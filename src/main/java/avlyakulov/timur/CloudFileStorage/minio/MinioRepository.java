@@ -34,6 +34,7 @@ public class MinioRepository {
         return getItemsFromResult(results);
     }
 
+    //todo make one method to find path recursive
     public List<Item> getObjectsRecursiveFromPath(String path, Integer userId) {
         String userDirectoryFormatted = String.format(userDirectory, userId).concat(path);
         Iterable<Result<Item>> results = minioClient.listObjects(
@@ -75,6 +76,7 @@ public class MinioRepository {
                 filesInDir.add(item.get());
             } catch (Exception e) {
                 log.error("Error during adding file to list in minio util");
+                throw new MinioGlobalFileException("Error during load files to page");
             }
         }
         return filesInDir;

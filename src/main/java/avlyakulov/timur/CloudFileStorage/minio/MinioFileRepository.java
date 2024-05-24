@@ -1,5 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
+import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
 import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import io.minio.*;
 import io.minio.messages.Item;
@@ -23,6 +24,7 @@ public class MinioFileRepository extends MinioRepository {
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
         } catch (Exception e) {
             log.error("Error during deleting file");
+            throw new MinioGlobalFileException("Error during deleting file");
         }
     }
 
@@ -46,7 +48,7 @@ public class MinioFileRepository extends MinioRepository {
                             .build());
         } catch (Exception e) {
             log.error("Error during copying object");
-            e.printStackTrace();
+            throw new MinioGlobalFileException("Error during updating file or dir");
         }
     }
 
@@ -60,7 +62,7 @@ public class MinioFileRepository extends MinioRepository {
                             .build());
         } catch (Exception e) {
             log.error("Error during downloading object from storage");
-            throw new RuntimeException(e);
+            throw new MinioGlobalFileException("Error during downloading file from server");
         }
     }
 }

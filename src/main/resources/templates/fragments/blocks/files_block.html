@@ -21,7 +21,7 @@
             <h3 class="header" th:if="${#strings.length(file.getObjectName()) < 16}"
                 th:text="${file.getObjectName()}"></h3>
             <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
-            <p th:text="'Size: ' + ${file.getSize()}"></p>
+            <p th:text="'Size: ' + ${file.getSize()} + 'MB'"></p>
             <p th:text="'Last modified: ' + ${file.getLastModified()}"></p>
         </div>
 

@@ -1,6 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
+import avlyakulov.timur.CloudFileStorage.custom_exceptions.SearchQueryException;
 import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
 import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
@@ -10,6 +11,7 @@ import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverte
 import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,7 +37,6 @@ public class FileController {
     @GetMapping
     public String getFilesPage(@AuthenticationPrincipal PersonDetails personDetails,
                                @RequestParam(name = "path", required = false) Optional<String> path, Model model) {
-        //todo change logic of auth principal it can't know about the capacity
         model.addAttribute("login", personDetails.getUsername());
         model.addAttribute("capacity", minioService.getUserCapacity(personDetails.getUserId()));
         String pathFromUrl = path.orElse(StringFileUtils.EMPTY_STRING);
@@ -45,8 +46,8 @@ public class FileController {
         if (pathFromUrl.isBlank()) {
             return "pages/files-page";
         }
-        String[] links = PathToBreadcrumbConverter.convertPathToBreadcrumb(pathFromUrl);
-        model.addAttribute("pathList", links);
+        String[] breadcrumb = PathToBreadcrumbConverter.convertPathToBreadcrumb(pathFromUrl);
+        model.addAttribute("pathList", breadcrumb);
         return "pages/files-page";
     }
 
@@ -61,7 +62,6 @@ public class FileController {
     @GetMapping("/search")
     public String searchFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("query") String filePrefix, Model model) {
         model.addAttribute("login", personDetails.getUsername());
-        //todo make validation for file query search, now we can search empty files
         List<FileResponse> files = minioService.searchFiles(filePrefix, personDetails.getUserId());
         model.addAttribute("files", files);
         return "pages/search-page";

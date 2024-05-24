@@ -1,6 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
+import avlyakulov.timur.CloudFileStorage.custom_exceptions.SearchQueryException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,8 +15,14 @@ public class GlobalExceptionHandler {
     private String maxUploadSize;
 
     @ExceptionHandler({MinioGlobalFileException.class})
-    public String handleException(Exception e, RedirectAttributes redirectAttributes) {
+    public String handleMinioGlobalException(Exception e, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("fileUploadError", e.getMessage());
+        return "redirect:/files";
+    }
+
+    @ExceptionHandler({SearchQueryException.class})
+    public String handleSearchQueryException(Exception e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("fileSearchError", e.getMessage());
         return "redirect:/files";
     }
 

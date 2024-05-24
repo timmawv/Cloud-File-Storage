@@ -1,5 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
+import avlyakulov.timur.CloudFileStorage.custom_exceptions.SearchQueryException;
 import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
 import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
@@ -13,6 +14,7 @@ import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -55,6 +57,8 @@ public class MinioService {
     }
 
     public List<FileResponse> searchFiles(String filePrefix, Integer userId) {
+        if (StringUtils.isBlank(filePrefix))
+            throw new SearchQueryException("You search query for file is wrong");
         List<Item> userFilesByPrefix = minioRepository.getFilesRecursiveFromUserDirectory(userId);
         List<FileResponse> filesResponse = fileMapper.mapListItemsFromStorageToListFileResponse(userFilesByPrefix);
         FileResponseConverter.convertFieldsFileResponse(filesResponse);
@@ -64,7 +68,6 @@ public class MinioService {
     }
 
     public String removeFile(String filePath, Boolean isDir, Integer userId) {
-        //todo something bad with dir deleting
         List<Item> files = minioRepository.getFilesRecursiveFromPath(filePath, userId);
         minioRepository.removeFile(filePath, isDir, userId);
         BigInteger sizeOfFile = CountFilesSize.countItemSize(files);

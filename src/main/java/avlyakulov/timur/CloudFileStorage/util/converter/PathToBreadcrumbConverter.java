@@ -5,17 +5,10 @@ public class PathToBreadcrumbConverter {
     public static String[] convertPathToBreadcrumb(String pathFromUrl) {
         String[] split = pathFromUrl.split("/");
         String[] links = new String[split.length];
-        for (int i = 0; i < links.length; ++i) {
-            int counter = 0;
-            if (i == 0) {
-                links[i] = split[i].concat("/");
-                continue;
-            }
-            StringBuilder stringBuilder = new StringBuilder();
-            while (counter != i + 1) {
-                stringBuilder.append(split[counter].concat("/"));
-                ++counter;
-            }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < split.length; i++) {
+            stringBuilder.append(split[i]).append("/");
             links[i] = stringBuilder.toString();
         }
         return links;
