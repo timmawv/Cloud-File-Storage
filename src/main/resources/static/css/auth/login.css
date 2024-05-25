@@ -1,6 +1,9 @@
 @import url('../pages/base.css');
 
+main {
+    align-content: center;
+}
+
 .container.main {
-    margin-top: 150px;
     width: 30%;
 }
