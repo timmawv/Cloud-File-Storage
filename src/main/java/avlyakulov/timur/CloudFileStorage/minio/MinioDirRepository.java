@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
+import avlyakulov.timur.CloudFileStorage.customexceptions.MinioGlobalFileException;
 import io.minio.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;

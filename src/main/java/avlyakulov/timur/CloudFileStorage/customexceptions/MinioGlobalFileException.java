@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.custom_exceptions;
+package avlyakulov.timur.CloudFileStorage.customexceptions;
 
 public class MinioGlobalFileException extends RuntimeException {
     public MinioGlobalFileException(String message) {

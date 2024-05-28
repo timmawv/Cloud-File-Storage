@@ -29,8 +29,8 @@ spring:
     change-log: db/changelog/main-changelog.xml
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+      max-file-size: 120MB
+      max-request-size: 120MB
       resolve-lazily: false
 server:
   tomcat:

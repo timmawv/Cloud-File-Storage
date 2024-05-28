@@ -5,7 +5,7 @@
             <button class="btn btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Action with file</button>
             <ul class="dropdown-menu">
                 <li data-bs-toggle="modal" th:data-bs-target="'#renameFileModal' + ${iterStat.index + 1}"><a class="dropdown-item">Rename file</a></li>
-                <li th:unless="${file.getIsDirectory()}"><a class="dropdown-item" th:href="'/files/upload?file=' + ${file.getFilePath()}">Download file</a></li>
+                <li th:unless="${file.getIsDirectory()}"><a class="dropdown-item" th:href="'/files/download?file=' + ${file.getFilePath()}">Download file</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li data-bs-toggle="modal" th:data-bs-target="'#deleteFileModal' + ${iterStat.index + 1}"><a class="dropdown-item">Delete file</a></li>
             </ul>

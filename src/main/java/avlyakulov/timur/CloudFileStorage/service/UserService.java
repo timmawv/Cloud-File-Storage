@@ -1,19 +1,17 @@
 package avlyakulov.timur.CloudFileStorage.service;
 
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.UserLoginAlreadyExistException;
+import avlyakulov.timur.CloudFileStorage.customexceptions.UserLoginAlreadyExistException;
 import avlyakulov.timur.CloudFileStorage.dto.UserDto;
 import avlyakulov.timur.CloudFileStorage.mapper.UserMapper;
 import avlyakulov.timur.CloudFileStorage.model.User;
 import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 @Service

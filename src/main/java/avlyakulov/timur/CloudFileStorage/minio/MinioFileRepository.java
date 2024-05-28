@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
+import avlyakulov.timur.CloudFileStorage.customexceptions.MinioGlobalFileException;
 import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import io.minio.*;
 import io.minio.messages.Item;
@@ -48,7 +48,7 @@ public class MinioFileRepository extends MinioRepository {
                             .build());
         } catch (Exception e) {
             log.error("Error during copying object");
-            throw new MinioGlobalFileException("Error during updating file or dir");
+            throw new MinioGlobalFileException("Error during copying file or dir");
         }
     }
 

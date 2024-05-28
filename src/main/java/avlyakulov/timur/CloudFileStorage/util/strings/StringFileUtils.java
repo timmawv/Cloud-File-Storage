@@ -22,4 +22,9 @@ public class StringFileUtils {
         }
         return EMPTY_STRING;
     }
+
+    public static String getFileName(String filePath) {
+        int lastIndexSlash = filePath.lastIndexOf("/");
+        return filePath.substring(lastIndexSlash + 1);
+    }
 }

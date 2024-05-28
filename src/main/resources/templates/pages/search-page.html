@@ -14,15 +14,18 @@
 
 <main>
     <div class="container">
-        <div th:if="${#lists.size(files) > 0}" class="file_container" th:each="file : ${files}">
-            <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
-            <p class="header_file_name" th:text="${file.getObjectName()}"></p>
-            <a class="path_file" th:href="'/files?path=' + ${#strings.replace(file.getFilePath(), file.getObjectName(), '')}">Move to file directory</a>
-            <p th:text="'Size: ' + ${file.getSize()}"></p>
-            <p th:text="'Last modified: ' + ${file.getLastModified()}"></p>
-        </div>
-        <div style="text-align: center" th:if = "${#lists.size(files) == 0}">
-            <h1>Nothing was found...</h1>
+        <div class="file_wrapper">
+            <div th:if="${#lists.size(files) > 0}" class="file_container" th:each="file : ${files}">
+                <img class="file_icon" th:src="${file.getFileIcon()}" alt="file icon">
+                <p class="header_file_name" th:text="${file.getObjectName()}"></p>
+                <a class="path_file" th:href="'/files?path=' + ${#strings.replace(file.getFilePath(), file.getObjectName(), '')}">Move to file directory</a>
+                <p th:text="'Size: ' + ${file.getSize()} + 'MB'"></p>
+                <p th:text="'Path to file: ' + ${file.getFilePath()}"></p>
+                <p th:text="'Last modified: ' + ${file.getLastModified()}"></p>
+            </div>
+            <div style="text-align: center" th:if = "${#lists.size(files) == 0}">
+                <h1>Nothing was found...</h1>
+            </div>
         </div>
     </div>
 </main>

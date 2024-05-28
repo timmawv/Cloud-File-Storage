@@ -9,9 +9,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @SpringBootTest
 @Testcontainers
@@ -34,7 +32,7 @@ public class UserIntegrationTestBase {
         registry.add("spring.datasource.driver-class-name", mysql::getDriverClassName);
         registry.add("spring.liquibase.enabled", () -> true);
         registry.add("spring.liquibase.change-log", () -> "db/changelog/main-changelog-test.xml");
-        registry.add("minio.host", () -> minio.getHost() + ":" + minio.getFirstMappedPort());
+        registry.add("minio.host", () -> "http://" + minio.getHost() + ":" + minio.getFirstMappedPort());
         registry.add("minio.login", () -> minio.getEnvMap().get("MINIO_ROOT_USER"));
         registry.add("minio.password", () -> minio.getEnvMap().get("MINIO_ROOT_PASSWORD"));
     }

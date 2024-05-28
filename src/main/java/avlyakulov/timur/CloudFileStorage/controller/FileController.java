@@ -1,7 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.SearchQueryException;
 import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
 import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
 import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
@@ -11,7 +10,6 @@ import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverte
 import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -51,10 +49,10 @@ public class FileController {
         return "pages/files-page";
     }
 
-    @GetMapping("/upload")
-    public ResponseEntity<Object> downloadFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("file") String filePath) {
+    @GetMapping("/download")
+    public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("file") String filePath) {
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodeStringUtf8(getFileName(filePath)) + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodeStringUtf8(StringFileUtils.getFileName(filePath)) + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(new InputStreamResource(minioService.downloadFile(filePath, personDetails.getUserId())));
     }
@@ -93,10 +91,5 @@ public class FileController {
 
     private String encodeStringUtf8(String string) {
         return URLEncoder.encode(string, StandardCharsets.UTF_8);
-    }
-
-    private String getFileName(String filePath) {
-        int lastIndexSlash = filePath.lastIndexOf("/");
-        return filePath.substring(lastIndexSlash + 1);
     }
 }

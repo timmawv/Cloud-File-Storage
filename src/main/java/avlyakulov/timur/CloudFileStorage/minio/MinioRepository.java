@@ -1,7 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioClientNotAuthenticatedException;
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.MinioGlobalFileException;
+import avlyakulov.timur.CloudFileStorage.customexceptions.MinioClientNotAuthenticatedException;
+import avlyakulov.timur.CloudFileStorage.customexceptions.MinioGlobalFileException;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.messages.Item;
@@ -15,15 +15,18 @@ import java.util.List;
 
 @Slf4j
 @Repository
-@RequiredArgsConstructor
 public class MinioRepository {
 
     protected final MinioClient minioClient;
     protected final String userDirectory = "user-%d-files/%s";
     protected final String usersBucketName = "user-files";
 
-    public List<Item> getObjectsFromPath(String path, Integer userId) {
+    public MinioRepository(MinioClient minioClient) {
+        this.minioClient = minioClient;
         baseMinioConfiguration();
+    }
+
+    public List<Item> getObjectsFromPath(String path, Integer userId) {
         String userDirectoryFormatted = String.format(userDirectory, userId, path);
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs
@@ -48,6 +51,7 @@ public class MinioRepository {
 
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
         for (MultipartFile file : files) {
+            //todo can be bug when we try to create a file with "" such name
             String userDirectoryFormatted = String.format(userDirectory, userId, pathToFile.concat(file.getOriginalFilename()));
             createFile(file, userDirectoryFormatted);
         }
@@ -82,8 +86,8 @@ public class MinioRepository {
     }
 
     private void baseMinioConfiguration() {
-        checkAuthMinio();
         createMainBucketIfItNotExist();
+        checkAuthMinio();
     }
 
     private void checkAuthMinio() {
@@ -105,7 +109,7 @@ public class MinioRepository {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(usersBucketName).build());
         } catch (Exception e) {
             log.error("something went wrong with minio while was creating main bucket");
-            throw new MinioGlobalFileException("Something went wrong with minio");
+            throw new MinioGlobalFileException("Something went wrong with minio while was creating main bucket");
         }
     }
 }

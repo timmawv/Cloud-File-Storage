@@ -23,5 +23,6 @@ public class MinioConfiguration {
                 .endpoint(minioHost)
                 .credentials(minioLogin, minioPassword)
                 .build();
+
     }
 }

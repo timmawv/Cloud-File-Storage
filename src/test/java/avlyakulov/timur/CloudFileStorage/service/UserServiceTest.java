@@ -1,7 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.service;
 
 import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
-import avlyakulov.timur.CloudFileStorage.custom_exceptions.UserLoginAlreadyExistException;
+import avlyakulov.timur.CloudFileStorage.customexceptions.UserLoginAlreadyExistException;
 import avlyakulov.timur.CloudFileStorage.dto.UserDto;
 import avlyakulov.timur.CloudFileStorage.model.User;
 import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
