@@ -25,6 +25,7 @@ services:
     ports:
       - "6379:6379"
 
+
   minio:
     image: quay.io/minio/minio
     container_name: minio_storage
@@ -37,6 +38,23 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: ["server", "/data", "--console-address", ":9001"]
+
+  cloud_storage:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_URL: jdbc:mysql://localhost:3306/file_storage
+      MINIO_HOST: http://localhost:9000
+      MINIO_LOGIN: minioadmin
+      MINIO_PASSWORD: minioadmin
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
 
 volumes:
   mysql_volume:
