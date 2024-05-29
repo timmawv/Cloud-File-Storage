@@ -1,8 +1,8 @@
 package avlyakulov.timur.CloudFileStorage.controller.auth;
 
-import avlyakulov.timur.CloudFileStorage.customexceptions.UserLoginAlreadyExistException;
-import avlyakulov.timur.CloudFileStorage.dto.UserDto;
-import avlyakulov.timur.CloudFileStorage.service.UserService;
+import avlyakulov.timur.CloudFileStorage.exceptions.UserLoginAlreadyExistException;
+import avlyakulov.timur.CloudFileStorage.user.UserDto;
+import avlyakulov.timur.CloudFileStorage.user.UserService;
 import avlyakulov.timur.CloudFileStorage.util.validator.LoginAndPasswordValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

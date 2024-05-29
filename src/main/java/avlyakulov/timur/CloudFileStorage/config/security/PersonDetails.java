@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.config.security;
 
-import avlyakulov.timur.CloudFileStorage.model.User;
+import avlyakulov.timur.CloudFileStorage.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,7 +9,7 @@ import java.util.Collections;
 
 public class PersonDetails implements UserDetails {
 
-    private User user;
+    private final User user;
 
     public PersonDetails(User user) {
         this.user = user;

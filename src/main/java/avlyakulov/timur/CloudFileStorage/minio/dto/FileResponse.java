@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.dto;
+package avlyakulov.timur.CloudFileStorage.minio.dto;
 
 import lombok.Getter;
 import lombok.Setter;

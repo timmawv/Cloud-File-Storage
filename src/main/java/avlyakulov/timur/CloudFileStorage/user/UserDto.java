@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.dto;
+package avlyakulov.timur.CloudFileStorage.user;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

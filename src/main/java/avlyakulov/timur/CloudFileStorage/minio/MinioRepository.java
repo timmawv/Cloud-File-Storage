@@ -1,11 +1,10 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.customexceptions.MinioClientNotAuthenticatedException;
-import avlyakulov.timur.CloudFileStorage.customexceptions.MinioGlobalFileException;
+import avlyakulov.timur.CloudFileStorage.exceptions.MinioClientNotAuthenticatedException;
+import avlyakulov.timur.CloudFileStorage.exceptions.MinioGlobalFileException;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.messages.Item;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +50,6 @@ public class MinioRepository {
 
     public void uploadFile(String pathToFile, MultipartFile[] files, Integer userId) {
         for (MultipartFile file : files) {
-            //todo can be bug when we try to create a file with "" such name
             String userDirectoryFormatted = String.format(userDirectory, userId, pathToFile.concat(file.getOriginalFilename()));
             createFile(file, userDirectoryFormatted);
         }

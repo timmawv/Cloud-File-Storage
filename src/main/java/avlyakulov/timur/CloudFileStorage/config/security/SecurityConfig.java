@@ -45,7 +45,6 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/files", true)
                         .failureUrl("/login?error")
                 ).logout(logout -> logout
-                        .permitAll()
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/main-page")
                 ).build();

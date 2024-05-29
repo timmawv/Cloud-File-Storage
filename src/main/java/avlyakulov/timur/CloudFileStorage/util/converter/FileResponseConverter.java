@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.util.converter;
 
-import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
 import avlyakulov.timur.CloudFileStorage.util.csv_parser.CsvFileParser;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.config.security;
 
-import avlyakulov.timur.CloudFileStorage.model.User;
-import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
+import avlyakulov.timur.CloudFileStorage.user.User;
+import avlyakulov.timur.CloudFileStorage.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

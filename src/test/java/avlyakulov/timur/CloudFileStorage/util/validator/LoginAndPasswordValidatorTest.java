@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.util.validator;
 
-import avlyakulov.timur.CloudFileStorage.dto.UserDto;
+import avlyakulov.timur.CloudFileStorage.user.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BeanPropertyBindingResult;

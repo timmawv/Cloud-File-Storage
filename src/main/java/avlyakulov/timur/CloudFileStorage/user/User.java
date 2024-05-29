@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.model;
+package avlyakulov.timur.CloudFileStorage.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

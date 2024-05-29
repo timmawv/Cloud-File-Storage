@@ -1,10 +1,11 @@
 package avlyakulov.timur.CloudFileStorage.service;
 
 import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
-import avlyakulov.timur.CloudFileStorage.customexceptions.UserLoginAlreadyExistException;
-import avlyakulov.timur.CloudFileStorage.dto.UserDto;
-import avlyakulov.timur.CloudFileStorage.model.User;
-import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
+import avlyakulov.timur.CloudFileStorage.exceptions.UserLoginAlreadyExistException;
+import avlyakulov.timur.CloudFileStorage.user.UserDto;
+import avlyakulov.timur.CloudFileStorage.user.User;
+import avlyakulov.timur.CloudFileStorage.user.UserRepository;
+import avlyakulov.timur.CloudFileStorage.user.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

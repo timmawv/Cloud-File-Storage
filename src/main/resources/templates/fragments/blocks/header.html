@@ -7,7 +7,7 @@
             </a>
         </div>
 
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" action="/files/search" role="search" method="GET">
+        <form th:if = "${login != null}" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" action="/files/search" role="search" method="GET">
             <input type="search" name="query" class="form-control" placeholder="Search file..." aria-label="Search">
             <p style="color: red" th:if="${fileSearchError}" th:text="${fileSearchError}">Upload error</p>
         </form>

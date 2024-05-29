@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.util.validator;
 
-import avlyakulov.timur.CloudFileStorage.dto.UserDto;
+import avlyakulov.timur.CloudFileStorage.user.UserDto;
 import com.nulabinc.zxcvbn.Strength;
 import com.nulabinc.zxcvbn.Zxcvbn;
 import org.springframework.stereotype.Component;

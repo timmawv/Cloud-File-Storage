@@ -1,11 +1,11 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
 import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
-import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
-import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
-import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
-import avlyakulov.timur.CloudFileStorage.model.User;
-import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRequest;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRenameRequest;
+import avlyakulov.timur.CloudFileStorage.user.User;
+import avlyakulov.timur.CloudFileStorage.user.UserRepository;
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
 import org.junit.jupiter.api.AfterEach;
@@ -54,9 +54,9 @@ class MinioServiceTest extends UserIntegrationTestBase {
         userRepository.save(user);
         Integer userId = userRepository.findByLogin(user.getLogin()).get().getId();
         MultipartFile multipartFile = new MockMultipartFile("video", "video.mp4", "video/mp4", "content".getBytes());
-        CreateFileDto createFileDto = new CreateFileDto("dir/dir/", new MultipartFile[]{multipartFile});
+        FileRequest fileRequest = new FileRequest("dir/dir/", new MultipartFile[]{multipartFile});
 
-        minioService.uploadFile(createFileDto, userId);
+        minioService.uploadFile(fileRequest, userId);
 
         List<FileResponse> userFiles = minioService.getUserFiles("dir/dir/", userId);
         assertThat(userFiles).hasSize(1);
@@ -71,9 +71,9 @@ class MinioServiceTest extends UserIntegrationTestBase {
         Integer firstUserId = userRepository.findByLogin(user.getLogin()).get().getId();
         Integer secondUserId = userRepository.findByLogin("dima").get().getId();
         MultipartFile multipartFile = new MockMultipartFile("video", "video.mp4", "video/mp4", "content".getBytes());
-        CreateFileDto createFileDto = new CreateFileDto("dir/dir/", new MultipartFile[]{multipartFile});
+        FileRequest fileRequest = new FileRequest("dir/dir/", new MultipartFile[]{multipartFile});
 
-        minioService.uploadFile(createFileDto, firstUserId);
+        minioService.uploadFile(fileRequest, firstUserId);
 
         List<FileResponse> userFiles = minioService.getUserFiles("dir/dir/", secondUserId);
         assertThat(userFiles).hasSize(0);
@@ -84,10 +84,10 @@ class MinioServiceTest extends UserIntegrationTestBase {
         userRepository.save(user);
         Integer userId = userRepository.findByLogin(user.getLogin()).get().getId();
         MultipartFile multipartFile = new MockMultipartFile("video", "video.mp4", "video/mp4", "content".getBytes());
-        CreateFileDto createFileDto = new CreateFileDto("dir/dir/", new MultipartFile[]{multipartFile});
-        minioService.uploadFile(createFileDto, userId);
+        FileRequest fileRequest = new FileRequest("dir/dir/", new MultipartFile[]{multipartFile});
+        minioService.uploadFile(fileRequest, userId);
 
-        minioService.updateFileName(new UpdateFileNameDto("video.mp4", "dir/dir/video.mp4", "vidos", false), userId);
+        minioService.updateFileName(new FileRenameRequest("video.mp4", "dir/dir/video.mp4", "vidos", false), userId);
 
         List<FileResponse> userFiles = minioService.getUserFiles("dir/dir/", userId);
         assertThat(userFiles.get(0).getObjectName()).isEqualTo("vidos.mp4");
@@ -98,8 +98,8 @@ class MinioServiceTest extends UserIntegrationTestBase {
         userRepository.save(user);
         Integer userId = userRepository.findByLogin(user.getLogin()).get().getId();
         MultipartFile multipartFile = new MockMultipartFile("video", "video.mp4", "video/mp4", "content".getBytes());
-        CreateFileDto createFileDto = new CreateFileDto("dir/dir/", new MultipartFile[]{multipartFile});
-        minioService.uploadFile(createFileDto, userId);
+        FileRequest fileRequest = new FileRequest("dir/dir/", new MultipartFile[]{multipartFile});
+        minioService.uploadFile(fileRequest, userId);
 
         minioService.removeFile("dir/dir/video.mp4", false, userId);
 
@@ -112,8 +112,8 @@ class MinioServiceTest extends UserIntegrationTestBase {
         userRepository.save(user);
         Integer userId = userRepository.findByLogin(user.getLogin()).get().getId();
         MultipartFile multipartFile = new MockMultipartFile("video", "video.mp4", "video/mp4", "content".getBytes());
-        CreateFileDto createFileDto = new CreateFileDto("dir/dir/", new MultipartFile[]{multipartFile});
-        minioService.uploadFile(createFileDto, userId);
+        FileRequest fileRequest = new FileRequest("dir/dir/", new MultipartFile[]{multipartFile});
+        minioService.uploadFile(fileRequest, userId);
 
         List<FileResponse> searchFiles = minioService.searchFiles("vi", userId);
 
@@ -128,8 +128,8 @@ class MinioServiceTest extends UserIntegrationTestBase {
         Integer firstUserId = userRepository.findByLogin(user.getLogin()).get().getId();
         Integer secondUserId = userRepository.findByLogin("dima").get().getId();
         MultipartFile multipartFile = new MockMultipartFile("video", "video.mp4", "video/mp4", "content".getBytes());
-        CreateFileDto createFileDto = new CreateFileDto("dir/dir/", new MultipartFile[]{multipartFile});
-        minioService.uploadFile(createFileDto, firstUserId);
+        FileRequest fileRequest = new FileRequest("dir/dir/", new MultipartFile[]{multipartFile});
+        minioService.uploadFile(fileRequest, firstUserId);
 
         List<FileResponse> searchFiles = minioService.searchFiles("vi", secondUserId);
         assertThat(searchFiles).hasSize(0);

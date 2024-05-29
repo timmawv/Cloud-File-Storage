@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.customexceptions;
+package avlyakulov.timur.CloudFileStorage.exceptions;
 
 public class UserLoginAlreadyExistException extends RuntimeException {
     public UserLoginAlreadyExistException(String message) {

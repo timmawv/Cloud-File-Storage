@@ -1,12 +1,11 @@
-package avlyakulov.timur.CloudFileStorage.controller;
+package avlyakulov.timur.CloudFileStorage.minio;
 
 import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
-import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
-import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
-import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
-import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
-import avlyakulov.timur.CloudFileStorage.minio.MinioService;
-import avlyakulov.timur.CloudFileStorage.util.converter.PathToBreadcrumbConverter;
+import avlyakulov.timur.CloudFileStorage.minio.dto.DirRequest;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRequest;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRenameRequest;
+import avlyakulov.timur.CloudFileStorage.util.converter.BreadcrumbConverter;
 import avlyakulov.timur.CloudFileStorage.util.strings.StringFileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/files")
 @RequiredArgsConstructor
-public class FileController {
+public class MinioController {
 
     private final MinioService minioService;
 
@@ -38,13 +37,13 @@ public class FileController {
         model.addAttribute("login", personDetails.getUsername());
         model.addAttribute("capacity", minioService.getUserCapacity(personDetails.getUserId()));
         String pathFromUrl = path.orElse(StringFileUtils.EMPTY_STRING);
+        model.addAttribute("path", pathFromUrl);
         List<FileResponse> files = minioService.getUserFiles(pathFromUrl, personDetails.getUserId());
         model.addAttribute("files", files);
-        model.addAttribute("path", pathFromUrl);
         if (pathFromUrl.isBlank()) {
             return "pages/files-page";
         }
-        String[] breadcrumb = PathToBreadcrumbConverter.convertPathToBreadcrumb(pathFromUrl);
+        String[] breadcrumb = BreadcrumbConverter.convertPathToBreadcrumb(pathFromUrl);
         model.addAttribute("pathList", breadcrumb);
         return "pages/files-page";
     }
@@ -66,15 +65,15 @@ public class FileController {
     }
 
     @PostMapping
-    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails, CreateFileDto createFileDto) {
-        minioService.uploadFile(createFileDto, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodeStringUtf8(createFileDto.getPath()));
+    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails, FileRequest fileRequest) {
+        minioService.uploadFile(fileRequest, personDetails.getUserId());
+        return "redirect:/files?path=".concat(encodeStringUtf8(fileRequest.getPath()));
     }
 
     @PostMapping("/directory")
-    public String uploadEmptyDirToServer(@AuthenticationPrincipal PersonDetails personDetails, CreateDirRequest createDirRequest) {
-        minioService.uploadEmptyDir(createDirRequest, personDetails.getUserId());
-        return "redirect:/files?path=".concat(encodeStringUtf8(createDirRequest.getPath()));
+    public String uploadEmptyDirToServer(@AuthenticationPrincipal PersonDetails personDetails, DirRequest dirRequest) {
+        minioService.uploadEmptyDir(dirRequest, personDetails.getUserId());
+        return "redirect:/files?path=".concat(encodeStringUtf8(dirRequest.getPath()));
     }
 
     @DeleteMapping
@@ -84,8 +83,8 @@ public class FileController {
     }
 
     @PatchMapping
-    public String updateFileName(@AuthenticationPrincipal PersonDetails personDetails, @ModelAttribute("renameFileForm") UpdateFileNameDto updateFileNameDto) {
-        String pathToFile = minioService.updateFileName(updateFileNameDto, personDetails.getUserId());
+    public String updateFileName(@AuthenticationPrincipal PersonDetails personDetails, @ModelAttribute("renameFileForm") FileRenameRequest fileRenameRequest) {
+        String pathToFile = minioService.updateFileName(fileRenameRequest, personDetails.getUserId());
         return "redirect:/files?path=".concat(encodeStringUtf8(pathToFile));
     }
 

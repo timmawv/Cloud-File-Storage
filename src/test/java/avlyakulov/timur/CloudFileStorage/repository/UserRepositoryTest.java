@@ -1,7 +1,8 @@
 package avlyakulov.timur.CloudFileStorage.repository;
 
 import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
-import avlyakulov.timur.CloudFileStorage.model.User;
+import avlyakulov.timur.CloudFileStorage.user.User;
+import avlyakulov.timur.CloudFileStorage.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

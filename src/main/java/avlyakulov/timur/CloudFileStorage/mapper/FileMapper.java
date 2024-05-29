@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.mapper;
 
-import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
 import io.minio.messages.Item;
 import org.mapstruct.*;
 

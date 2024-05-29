@@ -1,11 +1,11 @@
-package avlyakulov.timur.CloudFileStorage.dto;
+package avlyakulov.timur.CloudFileStorage.minio.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateDirRequest {
+public class DirRequest {
 
     private String dirName;
 

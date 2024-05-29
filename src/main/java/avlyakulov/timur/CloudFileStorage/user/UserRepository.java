@@ -1,6 +1,5 @@
-package avlyakulov.timur.CloudFileStorage.repository;
+package avlyakulov.timur.CloudFileStorage.user;
 
-import avlyakulov.timur.CloudFileStorage.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -1,7 +1,7 @@
 package avlyakulov.timur.CloudFileStorage.controller;
 
-import avlyakulov.timur.CloudFileStorage.customexceptions.MinioGlobalFileException;
-import avlyakulov.timur.CloudFileStorage.customexceptions.SearchQueryException;
+import avlyakulov.timur.CloudFileStorage.exceptions.MinioGlobalFileException;
+import avlyakulov.timur.CloudFileStorage.exceptions.SearchQueryException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.util.converter;
 
-import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

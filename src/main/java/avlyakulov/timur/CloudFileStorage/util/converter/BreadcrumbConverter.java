@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.util.converter;
 
-public class PathToBreadcrumbConverter {
+public class BreadcrumbConverter {
 
     public static String[] convertPathToBreadcrumb(String pathFromUrl) {
         String[] split = pathFromUrl.split("/");

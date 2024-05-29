@@ -2,6 +2,7 @@ package avlyakulov.timur.CloudFileStorage.minio;
 
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,14 +10,19 @@ import java.io.InputStream;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
-public class FacadeMinioRepository {
+public class MinioRepositoryFacade {
 
     private final MinioRepository minioRepository;
 
     private final MinioFileRepository minioFileRepository;
 
     private final MinioDirRepository minioDirRepository;
+
+    public MinioRepositoryFacade(@Qualifier("minioRepository") MinioRepository minioRepository, @Qualifier("minioFileRepository") MinioFileRepository minioFileRepository, @Qualifier("minioDirRepository") MinioDirRepository minioDirRepository) {
+        this.minioRepository = minioRepository;
+        this.minioFileRepository = minioFileRepository;
+        this.minioDirRepository = minioDirRepository;
+    }
 
     public List<Item> getFilesFromPath(String path, Integer userId) {
         return minioRepository.getObjectsFromPath(path, userId);

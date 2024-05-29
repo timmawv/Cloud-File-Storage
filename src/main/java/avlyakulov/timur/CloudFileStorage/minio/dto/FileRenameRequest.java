@@ -1,4 +1,4 @@
-package avlyakulov.timur.CloudFileStorage.dto;
+package avlyakulov.timur.CloudFileStorage.minio.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateFileNameDto {
+public class FileRenameRequest {
 
     private String oldFileName;
 

@@ -1,12 +1,12 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.customexceptions.SearchQueryException;
-import avlyakulov.timur.CloudFileStorage.dto.CreateDirRequest;
-import avlyakulov.timur.CloudFileStorage.dto.CreateFileDto;
-import avlyakulov.timur.CloudFileStorage.dto.FileResponse;
-import avlyakulov.timur.CloudFileStorage.dto.UpdateFileNameDto;
+import avlyakulov.timur.CloudFileStorage.exceptions.SearchQueryException;
+import avlyakulov.timur.CloudFileStorage.minio.dto.DirRequest;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRequest;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRenameRequest;
 import avlyakulov.timur.CloudFileStorage.mapper.FileMapper;
-import avlyakulov.timur.CloudFileStorage.repository.UserRepository;
+import avlyakulov.timur.CloudFileStorage.user.UserRepository;
 import avlyakulov.timur.CloudFileStorage.util.CountFilesSize;
 import avlyakulov.timur.CloudFileStorage.util.converter.FileResponseConverter;
 import avlyakulov.timur.CloudFileStorage.util.converter.FileSizeConverter;
@@ -29,15 +29,15 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MinioService {
 
-    private final FacadeMinioRepository minioRepository;
+    private final MinioRepositoryFacade minioRepository;
 
     private final UserRepository userRepository;
 
     private final FileMapper fileMapper;
 
-    public void uploadFile(CreateFileDto createFileDto, Integer userId) {
-        minioRepository.uploadFile(createFileDto.getPath(), createFileDto.getFiles(), userId);
-        BigInteger sizeOfFiles = CountFilesSize.countFileSize(Arrays.asList(createFileDto.getFiles()));
+    public void uploadFile(FileRequest fileRequest, Integer userId) {
+        minioRepository.uploadFile(fileRequest.getPath(), fileRequest.getFiles(), userId);
+        BigInteger sizeOfFiles = CountFilesSize.countFileSize(Arrays.asList(fileRequest.getFiles()));
         userRepository.increaseUserCapacity(sizeOfFiles, userId);
     }
 
@@ -45,8 +45,8 @@ public class MinioService {
         return FileSizeConverter.convertBytesToMB(userRepository.findUserCapacity(userId).orElse(BigInteger.ZERO));
     }
 
-    public void uploadEmptyDir(CreateDirRequest createDirRequest, Integer userId) {
-        minioRepository.uploadEmptyDir(createDirRequest.getDirName(), createDirRequest.getPath(), userId);
+    public void uploadEmptyDir(DirRequest dirRequest, Integer userId) {
+        minioRepository.uploadEmptyDir(dirRequest.getDirName(), dirRequest.getPath(), userId);
     }
 
     public List<FileResponse> getUserFiles(String path, Integer userId) {
@@ -79,25 +79,25 @@ public class MinioService {
         return minioRepository.downloadFile(filePath, userId);
     }
 
-    public String updateFileName(UpdateFileNameDto updateFileNameDto, Integer userId) {
-        String oldFileName = updateFileNameDto.getOldFileName();
-        String oldFilePath = updateFileNameDto.getOldFilePath();
-        String newFileName = updateFileNameDto.getNewFileName();
+    public String updateFileName(FileRenameRequest fileRenameRequest, Integer userId) {
+        String oldFileName = fileRenameRequest.getOldFileName();
+        String oldFilePath = fileRenameRequest.getOldFilePath();
+        String newFileName = fileRenameRequest.getNewFileName();
 
-        String pathToFile = StringFileUtils.getPathToObjectDirectory(oldFilePath, updateFileNameDto.getIsFileDirectory());
+        String pathToFile = StringFileUtils.getPathToObjectDirectory(oldFilePath, fileRenameRequest.getIsFileDirectory());
 
-        if (!updateFileNameDto.getIsFileDirectory()) {
+        if (!fileRenameRequest.getIsFileDirectory()) {
             String newFilePath = pathToFile.concat(newFileName).concat(StringFileUtils.getFileType(oldFileName));
             if (newFilePath.equals(oldFilePath)) {
                 return pathToFile;
             }
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
-            minioRepository.removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
+            minioRepository.removeFile(oldFilePath, fileRenameRequest.getIsFileDirectory(), userId);
         } else {
             String escapedFileName = Pattern.quote(oldFileName);
             String newPathDir = oldFilePath.replaceFirst("[" + escapedFileName + "]+\\/$", newFileName).concat("/");
             minioRepository.copyDirWithNewName(oldFilePath, newPathDir, userId);
-            minioRepository.removeFile(oldFilePath, updateFileNameDto.getIsFileDirectory(), userId);
+            minioRepository.removeFile(oldFilePath, fileRenameRequest.getIsFileDirectory(), userId);
         }
         return pathToFile;
     }
