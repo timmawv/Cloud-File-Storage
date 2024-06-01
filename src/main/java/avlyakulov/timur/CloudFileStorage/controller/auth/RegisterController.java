@@ -28,22 +28,22 @@ public class RegisterController {
     @GetMapping
     public String getRegisterPage(Model model) {
         model.addAttribute("user", new UserDto());
-        return "/auth/registration";
+        return "auth/registration";
     }
 
     @PostMapping
     public String registerUser(@ModelAttribute("user") @Valid UserDto userDto, BindingResult bindingResult, Model model) {
         loginAndPasswordValidator.validate(userDto, bindingResult);
         if (bindingResult.hasErrors()) {
-            return "/auth/registration";
+            return "auth/registration";
         }
         try {
             userService.saveUser(userDto);
         } catch (UserLoginAlreadyExistException e) {
             bindingResult.rejectValue("login", "", e.getMessage());
-            return "/auth/registration";
+            return "auth/registration";
         }
         model.addAttribute("success_registration", true);
-        return "/auth/registration";
+        return "auth/registration";
     }
 }

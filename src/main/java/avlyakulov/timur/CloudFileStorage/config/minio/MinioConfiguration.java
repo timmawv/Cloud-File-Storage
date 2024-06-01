@@ -11,6 +11,9 @@ public class MinioConfiguration {
     @Value("${minio.host}")
     private String minioHost;
 
+    @Value("${minio.port}")
+    private Integer minioPort;
+
     @Value("${minio.login}")
     private String minioLogin;
 
@@ -20,7 +23,7 @@ public class MinioConfiguration {
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint(minioHost)
+                .endpoint(minioHost, minioPort, false)
                 .credentials(minioLogin, minioPassword)
                 .build();
 

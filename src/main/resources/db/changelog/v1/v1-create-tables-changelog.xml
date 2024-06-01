@@ -44,7 +44,7 @@ https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
         </preConditions>
 
         <addColumn tableName="users">
-            <column name="capacity" type="bigint"/>
+            <column name="capacity" type="bigint" defaultValue="0"/>
         </addColumn>
     </changeSet>
 

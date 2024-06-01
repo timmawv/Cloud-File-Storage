@@ -96,7 +96,7 @@ public class MinioRepository {
             log.error("Please check your credentials in Minio");
             throw new MinioClientNotAuthenticatedException("Something went wrong with file storage");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new MinioGlobalFileException("Something went wrong with minio while was checking auth " + e.getMessage());
         }
     }
 
@@ -107,7 +107,7 @@ public class MinioRepository {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(usersBucketName).build());
         } catch (Exception e) {
             log.error("something went wrong with minio while was creating main bucket");
-            throw new MinioGlobalFileException("Something went wrong with minio while was creating main bucket");
+            throw new MinioGlobalFileException("Something went wrong with minio while was creating main bucket " + e.getMessage());
         }
     }
 }

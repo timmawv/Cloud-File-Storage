@@ -12,9 +12,9 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
-      interval: 2s
-      timeout: 10s
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=root" ]
+      interval: 10s
+      timeout: 5s
       retries: 5
 
   redis:
@@ -25,10 +25,9 @@ services:
     ports:
       - "6379:6379"
 
-
   minio:
     image: quay.io/minio/minio
-    container_name: minio_storage
+    container_name: miniostorage
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -37,19 +36,23 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
-    command: ["server", "/data", "--console-address", ":9001"]
+    command: [ "server", "/data", "--console-address", ":9001" ]
 
   cloud_storage:
     build:
       context: ./
       dockerfile: Dockerfile
+    container_name: cloud_storage
     environment:
-      DB_USERNAME: root
-      DB_PASSWORD: root
-      DB_URL: jdbc:mysql://localhost:3306/file_storage
-      MINIO_HOST: http://localhost:9000
+      MINIO_HOST: miniostorage
+      MINIO_PORT: 9000
       MINIO_LOGIN: minioadmin
       MINIO_PASSWORD: minioadmin
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_URL: jdbc:mysql://mysql_db:3306/file_storage
+      REDIS_HOST: redis_db
+      REDIS_PORT: 6379
     ports:
       - "8080:8080"
     depends_on:

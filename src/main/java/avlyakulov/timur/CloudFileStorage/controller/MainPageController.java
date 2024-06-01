@@ -14,8 +14,8 @@ public class MainPageController {
     @GetMapping
     public String getMainPage(@AuthenticationPrincipal PersonDetails personDetails, Model model) {
         if (personDetails == null)
-            return "/pages/main-page";
+            return "pages/main-page";
         model.addAttribute("login", personDetails.getUsername());
-        return "/pages/main-page";
+        return "pages/main-page";
     }
 }
