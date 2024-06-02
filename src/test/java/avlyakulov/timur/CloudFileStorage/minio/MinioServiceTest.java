@@ -8,9 +8,7 @@ import avlyakulov.timur.CloudFileStorage.user.User;
 import avlyakulov.timur.CloudFileStorage.user.UserRepository;
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -21,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = IntegrationBaseTest.class)
 class MinioServiceTest {
 
@@ -38,6 +37,11 @@ class MinioServiceTest {
     @BeforeEach
     void setUp() {
         user = new User("timur", "hardPassword123");
+    }
+
+    @BeforeAll
+    void clearUsers() {
+        userRepository.deleteAll();
     }
 
     @AfterEach

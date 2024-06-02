@@ -8,15 +8,15 @@ spring:
       enabled: false
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   session:
     timeout: 1800
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL:jdbc:mysql://localhost:3306/file_storage}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none
@@ -35,7 +35,7 @@ server:
   tomcat:
     max-swallow-size: -1
 minio:
-  host: ${MINIO_HOST:localhost}
-  port: ${MINIO_PORT:9000}
-  login: ${MINIO_LOGIN:minioadmin}
-  password: ${MINIO_PASSWORD:minioadmin}
+  host: ${MINIO_HOST}
+  port: ${MINIO_PORT}
+  login: ${MINIO_LOGIN}
+  password: ${MINIO_PASSWORD}

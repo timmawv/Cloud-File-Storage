@@ -7,4 +7,4 @@ FROM eclipse-temurin:17-jre
 WORKDIR /
 COPY --from=build /target/*.jar cloud_storage.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "cloud_storage.jar"]
+ENTRYPOINT ["java", "-jar", "cloud_storage.jar", "--spring.profiles.active=prod"]
