@@ -1,9 +1,9 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.UserIntegrationTestBase;
+import avlyakulov.timur.CloudFileStorage.IntegrationBaseTest;
+import avlyakulov.timur.CloudFileStorage.minio.dto.FileRenameRequest;
 import avlyakulov.timur.CloudFileStorage.minio.dto.FileRequest;
 import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
-import avlyakulov.timur.CloudFileStorage.minio.dto.FileRenameRequest;
 import avlyakulov.timur.CloudFileStorage.user.User;
 import avlyakulov.timur.CloudFileStorage.user.UserRepository;
 import io.minio.BucketExistsArgs;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +21,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-class MinioServiceTest extends UserIntegrationTestBase {
+@SpringBootTest(classes = IntegrationBaseTest.class)
+class MinioServiceTest {
 
     @Autowired
     private MinioService minioService;

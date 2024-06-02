@@ -3,8 +3,6 @@ spring:
     name: Cloud-File-Storage
   thymeleaf:
     cache: false
-#    prefix: classpath:/templates/
-#    suffix: .html
   devtools:
     restart:
       enabled: false
