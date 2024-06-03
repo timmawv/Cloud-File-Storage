@@ -39,9 +39,7 @@ services:
     command: [ "server", "/data", "--console-address", ":9001" ]
 
   cloud_storage:
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    image: timmawv/cloud_storage
     container_name: cloud_storage
     environment:
       MINIO_HOST: miniostorage
