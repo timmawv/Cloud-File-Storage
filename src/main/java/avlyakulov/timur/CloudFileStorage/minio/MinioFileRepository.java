@@ -23,7 +23,7 @@ public class MinioFileRepository extends MinioRepository {
         try {
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(usersBucketName).object(userFilePath).build());
         } catch (Exception e) {
-            log.error("Error during deleting file");
+            log.error("Error during deleting file " + e.getMessage());
             throw new MinioGlobalFileException("Error during deleting file");
         }
     }
@@ -47,7 +47,7 @@ public class MinioFileRepository extends MinioRepository {
                                             .build())
                             .build());
         } catch (Exception e) {
-            log.error("Error during copying object");
+            log.error("Error during copying object " + e.getMessage());
             throw new MinioGlobalFileException("Error during copying file or dir");
         }
     }
@@ -61,7 +61,7 @@ public class MinioFileRepository extends MinioRepository {
                             .object(userFilePath)
                             .build());
         } catch (Exception e) {
-            log.error("Error during downloading object from storage");
+            log.error("Error during downloading object from storage " + e.getMessage());
             throw new MinioGlobalFileException("Error during downloading file from server");
         }
     }

@@ -86,11 +86,11 @@ public class MinioService {
 
         String pathToFile = StringFileUtils.getPathToObjectDirectory(oldFilePath, fileRenameRequest.getIsFileDirectory());
 
+        if (areNamesSame(oldFileName, newFileName, fileRenameRequest.getIsFileDirectory()))
+            return pathToFile;
+
         if (!fileRenameRequest.getIsFileDirectory()) {
             String newFilePath = pathToFile.concat(newFileName).concat(StringFileUtils.getFileType(oldFileName));
-            if (newFilePath.equals(oldFilePath)) {
-                return pathToFile;
-            }
             minioRepository.copyFileWithNewName(newFilePath, oldFilePath, userId);
             minioRepository.removeFile(oldFilePath, fileRenameRequest.getIsFileDirectory(), userId);
         } else {
@@ -100,5 +100,14 @@ public class MinioService {
             minioRepository.removeFile(oldFilePath, fileRenameRequest.getIsFileDirectory(), userId);
         }
         return pathToFile;
+    }
+
+    private boolean areNamesSame(String oldFileName, String newFileName, Boolean isDir) {
+        if (isDir) {
+            return oldFileName.equals(newFileName);
+        } else {
+            String fileType = StringFileUtils.getFileType(oldFileName);
+            return oldFileName.equals(newFileName.concat(fileType));
+        }
     }
 }

@@ -65,7 +65,7 @@ public class MinioRepository {
                             .build());
             object.object();
         } catch (Exception e) {
-            log.error("something went wrong with minio while was creating user directory");
+            log.error("something went wrong with minio while was creating user directory " + e.getMessage());
             throw new MinioGlobalFileException("File with such name not supported: " + file.getOriginalFilename());
         }
     }

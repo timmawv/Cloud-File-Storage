@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = IntegrationBaseTest.class)
-class RepositoryTest {
+class UserRepositoryTest {
 
     private User user = new User("timur", "123");
 

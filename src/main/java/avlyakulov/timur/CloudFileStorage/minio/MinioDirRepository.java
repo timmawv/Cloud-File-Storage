@@ -28,7 +28,7 @@ public class MinioDirRepository extends MinioRepository {
                             .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
                             .build());
         } catch (Exception e) {
-            log.error("Error during creating empty directory");
+            log.error("Error during creating empty directory " + e.getMessage());
             throw new MinioGlobalFileException("Error during creating empty dir on the server");
         }
     }
@@ -55,7 +55,7 @@ public class MinioDirRepository extends MinioRepository {
                 DeleteError error = result.get();
                 System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error during removing directory " + e.getMessage());
                 throw new MinioGlobalFileException("Error during removing directory");
             }
         }
@@ -74,7 +74,7 @@ public class MinioDirRepository extends MinioRepository {
                                             .build())
                             .build());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error during copying file with new name " + e.getMessage());
             throw new MinioGlobalFileException("Error during copying file with new name");
         }
     }
