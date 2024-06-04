@@ -16,12 +16,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Modifying
     @Transactional
-    @Query("update User set capacity = capacity + ?1 where id = ?2")
+    @Query("update User set capacity = capacity + :capacity where id = :userId")
     void increaseUserCapacity(BigInteger capacity, Integer userId);
 
     @Modifying
     @Transactional
-    @Query("update User set capacity = capacity - ?1 where id = ?2")
+    @Query("update User set capacity = capacity - :capacity where id = :userId")
     void decreaseUserCapacity(BigInteger capacity, Integer userId);
 
     @Query("select capacity from User where id = ?1")

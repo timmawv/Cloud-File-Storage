@@ -1,6 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.minio;
 
-import avlyakulov.timur.CloudFileStorage.config.security.PersonDetails;
+import avlyakulov.timur.CloudFileStorage.config.security.UserDetailsImpl;
 import avlyakulov.timur.CloudFileStorage.minio.dto.DirRequest;
 import avlyakulov.timur.CloudFileStorage.minio.dto.FileRequest;
 import avlyakulov.timur.CloudFileStorage.minio.dto.FileResponse;
@@ -32,13 +32,13 @@ public class MinioController {
     private final MinioService minioService;
 
     @GetMapping
-    public String getFilesPage(@AuthenticationPrincipal PersonDetails personDetails,
+    public String getFilesPage(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                @RequestParam(name = "path", required = false) Optional<String> path, Model model) {
-        model.addAttribute("login", personDetails.getUsername());
-        model.addAttribute("capacity", minioService.getUserCapacity(personDetails.getUserId()));
+        model.addAttribute("login", userDetailsImpl.getUsername());
+        model.addAttribute("capacity", minioService.getUserCapacity(userDetailsImpl.getUserId()));
         String pathFromUrl = path.orElse(StringFileUtils.EMPTY_STRING);
         model.addAttribute("path", pathFromUrl);
-        List<FileResponse> files = minioService.getUserFiles(pathFromUrl, personDetails.getUserId());
+        List<FileResponse> files = minioService.getUserFiles(pathFromUrl, userDetailsImpl.getUserId());
         model.addAttribute("files", files);
         if (pathFromUrl.isBlank()) {
             return "pages/files-page";
@@ -49,42 +49,42 @@ public class MinioController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("file") String filePath) {
+    public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam("file") String filePath) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodeStringUtf8(StringFileUtils.getFileName(filePath)) + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new InputStreamResource(minioService.downloadFile(filePath, personDetails.getUserId())));
+                .body(new InputStreamResource(minioService.downloadFile(filePath, userDetailsImpl.getUserId())));
     }
 
     @GetMapping("/search")
-    public String searchFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("query") String filePrefix, Model model) {
-        model.addAttribute("login", personDetails.getUsername());
-        List<FileResponse> files = minioService.searchFiles(filePrefix, personDetails.getUserId());
+    public String searchFile(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam("query") String filePrefix, Model model) {
+        model.addAttribute("login", userDetailsImpl.getUsername());
+        List<FileResponse> files = minioService.searchFiles(filePrefix, userDetailsImpl.getUserId());
         model.addAttribute("files", files);
         return "pages/search-page";
     }
 
     @PostMapping
-    public String uploadFileToServer(@AuthenticationPrincipal PersonDetails personDetails, FileRequest fileRequest) {
-        minioService.uploadFile(fileRequest, personDetails.getUserId());
+    public String uploadFileToServer(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, FileRequest fileRequest) {
+        minioService.uploadFile(fileRequest, userDetailsImpl.getUserId());
         return "redirect:/files?path=".concat(encodeStringUtf8(fileRequest.getPath()));
     }
 
     @PostMapping("/directory")
-    public String uploadEmptyDirToServer(@AuthenticationPrincipal PersonDetails personDetails, DirRequest dirRequest) {
-        minioService.uploadEmptyDir(dirRequest, personDetails.getUserId());
+    public String uploadEmptyDirToServer(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, DirRequest dirRequest) {
+        minioService.uploadEmptyDir(dirRequest, userDetailsImpl.getUserId());
         return "redirect:/files?path=".concat(encodeStringUtf8(dirRequest.getPath()));
     }
 
     @DeleteMapping
-    public String deleteFile(@AuthenticationPrincipal PersonDetails personDetails, @RequestParam("isDir") Boolean isDir, @RequestParam("file") String filePath) {
-        String pathToFileDirectory = minioService.removeFile(filePath, isDir, personDetails.getUserId());
+    public String deleteFile(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam("isDir") Boolean isDir, @RequestParam("file") String filePath) {
+        String pathToFileDirectory = minioService.removeFile(filePath, isDir, userDetailsImpl.getUserId());
         return "redirect:/files?path=".concat(encodeStringUtf8(pathToFileDirectory));
     }
 
     @PatchMapping
-    public String updateFileName(@AuthenticationPrincipal PersonDetails personDetails, @ModelAttribute("renameFileForm") FileRenameRequest fileRenameRequest) {
-        String pathToFile = minioService.updateFileName(fileRenameRequest, personDetails.getUserId());
+    public String updateFileName(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @ModelAttribute("renameFileForm") FileRenameRequest fileRenameRequest) {
+        String pathToFile = minioService.updateFileName(fileRenameRequest, userDetailsImpl.getUserId());
         return "redirect:/files?path=".concat(encodeStringUtf8(pathToFile));
     }
 

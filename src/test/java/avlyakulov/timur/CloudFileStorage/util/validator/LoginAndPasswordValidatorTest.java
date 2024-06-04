@@ -1,5 +1,6 @@
 package avlyakulov.timur.CloudFileStorage.util.validator;
 
+import avlyakulov.timur.CloudFileStorage.config.security.validator.LoginAndPasswordValidator;
 import avlyakulov.timur.CloudFileStorage.user.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,9 @@
-package avlyakulov.timur.CloudFileStorage.util.validator;
+package avlyakulov.timur.CloudFileStorage.config.security.validator;
 
 import avlyakulov.timur.CloudFileStorage.user.UserDto;
 import com.nulabinc.zxcvbn.Strength;
 import com.nulabinc.zxcvbn.Zxcvbn;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -28,7 +29,7 @@ public class LoginAndPasswordValidator implements Validator {
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
+    public void validate(@NotNull Object target, @NotNull Errors errors) {
         UserDto userDto = (UserDto) target;
         String login = userDto.getLogin();
         String password = userDto.getPassword();

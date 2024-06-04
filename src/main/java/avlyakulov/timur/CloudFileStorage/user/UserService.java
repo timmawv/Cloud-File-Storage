@@ -1,15 +1,17 @@
 package avlyakulov.timur.CloudFileStorage.user;
 
-import avlyakulov.timur.CloudFileStorage.exceptions.UserLoginAlreadyExistException;
 import avlyakulov.timur.CloudFileStorage.mapper.UserMapper;
+import avlyakulov.timur.CloudFileStorage.config.security.validator.LoginAndPasswordValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
+@Slf4j
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -19,14 +21,23 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public void saveUser(UserDto userDto) {
+    private final LoginAndPasswordValidator loginAndPasswordValidator;
+
+    public String saveUser(UserDto userDto, BindingResult bindingResult, Model model) {
+        loginAndPasswordValidator.validate(userDto, bindingResult);
+        if (bindingResult.hasErrors()) {
+            return "auth/registration";
+        }
         User user = userMapper.mapUserDtoToUser(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         try {
             userRepository.save(user);
+            model.addAttribute("success_registration", true);
         } catch (DataIntegrityViolationException e) {
-            throw new UserLoginAlreadyExistException("User with such login already exists");
+            log.error("User with such login {} already exists", userDto.getLogin());
+            bindingResult.rejectValue("login", "", "user with such login already exists");
+            return "auth/registration";
         }
+        return "auth/registration";
     }
 }

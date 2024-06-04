@@ -12,11 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest(classes = IntegrationBaseTest.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,22 +48,28 @@ class UserServiceTest {
 
     @Test
     public void saveUser_userWasSaved_validUser() {
-        userService.saveUser(userValid);
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(userValid, "validUserDto");
+        Model model = new ConcurrentModel();
+        userService.saveUser(userValid, bindingResult, model);
 
         List<User> users = userRepository.findAll();
         User user = users.get(0);
 
+        boolean successRegistration = (boolean) model.getAttribute("success_registration");
+        assertThat(successRegistration).isTrue();
         assertThat(user.getLogin()).isEqualTo(userValid.getLogin());
         assertThat(users).hasSize(1);
     }
 
     @Test
     public void saveUser_userNotSaved_userAlreadyExists() {
-        userService.saveUser(userValid);
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(userValid, "validUserDto");
+        Model model = new ConcurrentModel();
+        userService.saveUser(userValid, bindingResult, model);
 
-        UserLoginAlreadyExistException userLoginAlreadyExistException = assertThrows(UserLoginAlreadyExistException.class, () -> userService.saveUser(userValid));
-        assertThat(userLoginAlreadyExistException.getMessage()).isEqualTo("User with such login already exists");
+        userService.saveUser(userValid, bindingResult, model);
 
+        assertThat(bindingResult.hasErrors()).isTrue();
         List<User> users = userRepository.findAll();
         assertThat(users).hasSize(1);
     }
