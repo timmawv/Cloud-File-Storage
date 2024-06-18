@@ -21,7 +21,7 @@ This app has Dockerfile and docker compose too.
 * Delete
 * Create empty directory
 
-Project from this [course](https://zhukovsd.github.io/java-backend-learning-course/)
+<!-- Project from this [course](https://zhukovsd.github.io/java-backend-learning-course/) -->
 
 ## Project Stack
 
